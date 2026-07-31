@@ -1,0 +1,103 @@
+Issue Type,Summary,Description,Epic Name,Epic Link,Labels,Priority
+Epic,"Project Ops — repo, conventions, tracking","Repository skeleton, git/PR conventions, Jira board, CI. CNV-1..CNV-5 compliance.",Project Ops,,,Medium
+Epic,Phase 0 — Environment bring-up & teleop baseline,Everything below autonomy works and is demonstrated before any Nav2/NVblox work. Exit: AC0-1..AC0-4.,Phase 0,,,Medium
+Epic,Phase 1a — Nav2 on ground truth + static map,"Control-stack validation, no NVblox. Nav2 config open for research; experiments documented.",Phase 1a,,,Medium
+Epic,Phase 1b — NVblox as costmap source,Perception is load-bearing: goals reached with obstacles absent from any static map. Exit: AC1-1..AC1-5.,Phase 1b,,,Medium
+Epic,Phase 2 — Noisy-sensor localization,EKF (wheel odom + IMU) + simulated GNSS; GT only for evaluation. Safety layer added. To be specified in detail.,Phase 2,,,Medium
+Epic,Phase 3 — Real system integration,"Swap hardware interface, not logic. Jetson AGX Orin, real D435i + HERE4. To be specified in detail.",Phase 3,,,Medium
+Epic,"Phase 1 — Cross-cutting (kinematics completion, observability, exit)","TK-3, Foxglove, AC1 verification.",Phase 1 — Cross,,,Medium
+Story,[OPS-1] Push rover_autonomy_ws skeleton to GitHub,"9 ament_cmake packages per §9, CNV-4 READMEs, .gitignore, LFS attributes, PR template, ADR/experiment templates.
+
+Spec ref: SUR-AUT-SPEC-001 §2, 9 — task OPS-1.",,Project Ops,OPS-1,High
+Story,[OPS-2] Branch protection + review rule on main,"PR + 1 review required; no direct pushes; squash-merge policy for exp/ branches.
+
+Spec ref: SUR-AUT-SPEC-001 §2, 9 — task OPS-2.",,Project Ops,OPS-2,High
+Story,[OPS-3] Record workstation GPU + exact Isaac Sim build in root README,"§3: GPU model/VRAM and the Isaac Sim build verified against Isaac ROS 4.5.0 release notes.
+
+Spec ref: SUR-AUT-SPEC-001 §2, 9 — task OPS-3.",,Project Ops,OPS-3,High
+Story,[OPS-4] CI: colcon build + colcon test on PR,"Minimum: kinematics unit tests run per AC0-3; lint via ament_lint_auto.
+
+Spec ref: SUR-AUT-SPEC-001 §2, 9 — task OPS-4.",,Project Ops,OPS-4,Medium
+Story,[T0-S1] Import rover URDF into Isaac Sim,"Verify joint hierarchy, collision meshes, mass/inertia sanity — no jitter/sink/explode at rest.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S1.",,Phase 0,T0-S1,High
+Story,[T0-S2] Assign wheel–ground friction with sourced values,"Physics material pair; initial values documented with source (measured/datasheet/literature) in rover_sim/docs/physics_materials.md — never silently invented.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S2.",,Phase 0,T0-S2,Medium
+Story,[T0-S3] Configure joint drives + record gain mapping,"Steer = position drives; drive wheels = pure velocity (stiffness 0, damping = gain). Gains consistent with AK60-6/AK10-9 servo mode; Isaac↔servo mapping recorded in repo.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S3.",,Phase 0,T0-S3,High
+Story,[T0-S4] Action graph: actuation,"Subscribe joint command topic, apply to articulation.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S4.",,Phase 0,T0-S4,Medium
+Story,[T0-S5] Action graph: state,"/isaac_joint_states, GT odom→base_link TF, /odom, /clock.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S5.",,Phase 0,T0-S5,Medium
+Story,[T0-S6] Action graph: camera (D435i-equivalent),"Depth, color, camera_info at configured res/rate; match real D435i intrinsics/FOV where practical.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S6.",,Phase 0,T0-S6,Medium
+Story,[T0-S7] Environment 1: flat test plane,"Factory + labyrinth deferred to T1b-3; Mars-yard AprilTag deferred to Phase 2.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S7.",,Phase 0,T0-S7,Medium
+Story,[T0-S8] Single bringup: scene + all action graphs from one command,"One script/launch; documented in rover_sim/docs/.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-S8.",,Phase 0,T0-S8,Medium
+Story,[T0-R1] Repository skeleton + robot_description,"URDF/xacro + robot_state_publisher. (Skeleton itself under OPS-1; this story = working robot_description.)
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-R1.",,Phase 0,T0-R1,High
+Story,[T0-R2] ros2_control with topic_based hardware interface,"Verification: mixed command interfaces (position steer / velocity drive) in pinned version. If broken: thin JointState bridge fallback; finding recorded in rover_control README.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-R2.",,Phase 0,T0-R2,High
+Story,[T0-R3] ADR + implement double-Ackermann IK,"Research decision FIRST (ADR): custom C++ vs adapted steering_controllers_library vs cascaded. Then implement. Unit tests: straight, pure arc L/R, zero-speed steering.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-R3.",,Phase 0,T0-R3,Highest
+Story,[T0-R4] Teleop package,"Keyboard/gamepad → /cmd_vel → IK → rover drives correctly in sim.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task T0-R4.",,Phase 0,T0-R4,Medium
+Story,[AC0] Phase 0 exit verification,"AC0-1 figure-eight no scrubbing; AC0-2 clean TF ≥30 Hz + use_sim_time verified; AC0-3 IK tests in CI/committed; AC0-4 recording + written test report.
+
+Spec ref: SUR-AUT-SPEC-001 §5 — task AC0.",,Phase 0,AC0,Highest
+Story,[T1a-1] Nav2 bringup (Smac Hybrid-A* / RPP candidates),"Back-up recovery disabled (single forward camera). Consistency check: planner min_turning_radius matches kinematics reality.
+
+Spec ref: SUR-AUT-SPEC-001 §6.1 — task T1a-1.",,Phase 1a,T1a-1,High
+Story,[T1a-2] Costmaps: static global (map_server) + rolling local,"Static layer only for now.
+
+Spec ref: SUR-AUT-SPEC-001 §6.1 — task T1a-2.",,Phase 1a,T1a-2,Medium
+Story,"[T1a-3] Goal-reaching demos, flat scene + baked-in obstacles","
+
+Spec ref: SUR-AUT-SPEC-001 §6.1 — task T1a-3.",,Phase 1a,T1a-3,Medium
+Story,[T1a-4] Planner/controller comparison experiment,"RPP vs MPPI (Ackermann model) under steering-rate limits. REQUIRED evaluation artifact — docs/experiments/ template.
+
+Spec ref: SUR-AUT-SPEC-001 §6.1 — task T1a-4.",,Phase 1a,T1a-4,High
+Story,[T1b-1] Isaac ROS Dev env + NVblox quickstart reproduced as-is,"Before any customization. Managed container only.
+
+Spec ref: SUR-AUT-SPEC-001 §6.2 — task T1b-1.",,Phase 1b,T1b-1,High
+Story,[T1b-2] NVblox on our camera/TF; nvblox_nav2 costmap into Nav2,"Depth + GT pose → ESDF slice → costmap plugin. Custom config + custom bringup script.
+
+Spec ref: SUR-AUT-SPEC-001 §6.2 — task T1b-2.",,Phase 1b,T1b-2,High
+Story,[T1b-3] Factory + labyrinth environments; perception load-bearing demos,"Obstacles not present in any static map.
+
+Spec ref: SUR-AUT-SPEC-001 §6.2 — task T1b-3.",,Phase 1b,T1b-3,Medium
+Story,[TK-3] Wheel odometry (forward kinematics) + drift report,"joint_states → twist → Odometry. Validated vs GT: drift % over fixed 50 m course (AC1-4).
+
+Spec ref: SUR-AUT-SPEC-001 §6.3–6.5 — task TK-3.",,Phase 1 — Cross,TK-3,Medium
+Story,[T1-OBS] Foxglove interface,"foxglove_bridge + saved layout: TF, camera/depth, NVblox costmap, plan, /cmd_vel, goal/pose 2D panel. Open for creativity, must stay genuinely useful.
+
+Spec ref: SUR-AUT-SPEC-001 §6.3–6.5 — task T1-OBS.",,Phase 1 — Cross,T1-OBS,Medium
+Story,[AC1] Phase 1 exit verification,"≥90% over 20 goals ×2 envs @0.25 m/15°; zero collisions; cross-track ≤0.15 m; odom drift reported; written report + frozen tagged params + RPP/MPPI comparison + NVblox numbers.
+
+Spec ref: SUR-AUT-SPEC-001 §6.3–6.5 — task AC1.",,Phase 1 — Cross,AC1,Highest
+Story,[P2-KICKOFF] Phase 2 detailed specification + localization ADR,"What to fuse, global correction source, EKF vs alternatives; GNSS sim node design mirroring HERE4; safety layer (cmd_vel watchdog, clamps). Mars-yard AprilTag env if stretch pursued.
+
+Spec ref: SUR-AUT-SPEC-001 §7 — task P2-KICKOFF.",,Phase 2,P2-KICKOFF,Medium
+Story,[P3-KICKOFF] Phase 3 detailed specification,"Real hardware interface transport decision (micro-ROS / UDP / CAN); JetPack–Isaac ROS pairing on Orin; Ubuntu 24.04/Jazzy availability check; D435i sunlight degradation plan; CAN bus load with 8 servo motors.
+
+Spec ref: SUR-AUT-SPEC-001 §8 — task P3-KICKOFF.",,Phase 3,P3-KICKOFF,Medium
+Epic,Gazebo RTK Sim — GNSS/RTK localization track,Parallel Gazebo Harmonic track per ADR-0001. NavSat + RTK error model + navsat_transform/EKF. Simulator-agnostic localization stack.,Gazebo RTK Sim,,,Medium
+Story,[GZ-1] Gazebo Harmonic + ros_gz setup on Jazzy,"Install pairing, verify /clock bridging and use_sim_time (CNV-3). Record versions in root README.",,Gazebo RTK Sim,GZ-1,High
+Story,[GZ-2] URDF simulator:=isaac|gazebo xacro arg + spawn,"One robot model, two exports (ADR-0001). Rover spawns in flat_gnss.sdf without physics anomalies.",,Gazebo RTK Sim,GZ-2,High
+Story,[GZ-3] Drive bridge: joint commands + /joint_states via ros_gz,Reuse kinematics IK output where practical; teleop drives rover in Gazebo.,,Gazebo RTK Sim,GZ-3,Medium
+Story,[GZ-4] NavSat sensor + spherical-coordinates world,worlds/flat_gnss.sdf with geodetic origin; raw NavSatFix at configured rate. IMU sensor enabled.,,Gazebo RTK Sim,GZ-4,High
+Story,[GZ-5] RTK error model node,"Wrap raw fix: RTK-fixed (~1-2 cm) / RTK-float (dm) / dropout states, latency + outage injection, mirroring HERE4. Params = reference model for Phase 3 validation.",,Gazebo RTK Sim,GZ-5,High
+Story,[GZ-6] navsat_transform + EKF: map->odom from RTK fix,robot_localization chain in rover_localization; TF-2 layout; GT republished on diagnostics only.,,Gazebo RTK Sim,GZ-6,High
+Story,[GZ-7] Validation vs Gazebo ground truth,Pose error under each RTK state and under dropouts; written report in docs/experiments/.,,Gazebo RTK Sim,GZ-7,Medium

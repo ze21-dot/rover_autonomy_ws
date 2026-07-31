@@ -1,0 +1,20 @@
+# colcon
+build/
+install/
+log/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# ROS
+*.pgm.bak
+rosbag2_*/
+
+# OS
+.DS_Store
