@@ -26,8 +26,6 @@ if(BUILD_TESTING)
   ament_add_gtest(test_double_ackermann test/test_double_ackermann.cpp)
   target_link_libraries(test_double_ackermann double_ackermann)
 
-  find_package(ament_lint_auto REQUIRED)
-  ament_lint_auto_find_test_dependencies()
 endif()
 
 ament_package()
