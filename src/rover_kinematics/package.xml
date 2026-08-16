@@ -2,13 +2,18 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rover_kinematics</name>
-  <version>0.1.0</version>
-  <description>Double-Ackermann inverse kinematics (Twist -> per-wheel steer angle + drive speed) and forward direction (wheel odometry).</description>
+  <version>0.2.0</version>
+  <description>Double-Ackermann inverse/forward kinematics: ROS-free geometry library plus thin Twist-to-wheel-commands bridge node (ADR-0002).</description>
   <maintainer email="zeynep@sabanciuniv.edu">Zeynep Altundal</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
   <depend>rover_msgs</depend>
+
   <test_depend>ament_cmake_gtest</test_depend>
 
   <export>

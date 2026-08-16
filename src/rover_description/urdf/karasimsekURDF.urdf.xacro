@@ -549,4 +549,65 @@
     <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher"/>
   </gazebo>
 
+  <gazebo>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>FLSteerJoint</joint_name>
+      <topic>/karasimsek/cmd/fl_steer</topic>
+      <p_gain>40.0</p_gain>
+      <i_gain>0.2</i_gain>
+      <d_gain>2.0</d_gain>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>FLWheelJoint</joint_name>
+      <topic>/karasimsek/cmd/fl_wheel</topic>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>FRSteerJoint</joint_name>
+      <topic>/karasimsek/cmd/fr_steer</topic>
+      <p_gain>40.0</p_gain>
+      <i_gain>0.2</i_gain>
+      <d_gain>2.0</d_gain>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>FRWheelJoint</joint_name>
+      <topic>/karasimsek/cmd/fr_wheel</topic>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>RLSteerJoint</joint_name>
+      <topic>/karasimsek/cmd/rl_steer</topic>
+      <p_gain>40.0</p_gain>
+      <i_gain>0.2</i_gain>
+      <d_gain>2.0</d_gain>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>RLWheelJoint</joint_name>
+      <topic>/karasimsek/cmd/rl_wheel</topic>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-position-controller-system" name="gz::sim::systems::JointPositionController">
+      <joint_name>RRSteerJoint</joint_name>
+      <topic>/karasimsek/cmd/rr_steer</topic>
+      <p_gain>40.0</p_gain>
+      <i_gain>0.2</i_gain>
+      <d_gain>2.0</d_gain>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-joint-controller-system" name="gz::sim::systems::JointController">
+      <joint_name>RRWheelJoint</joint_name>
+      <topic>/karasimsek/cmd/rr_wheel</topic>
+    </plugin>
+  </gazebo>
+
 </robot>
