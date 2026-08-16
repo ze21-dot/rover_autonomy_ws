@@ -14,7 +14,7 @@
   <xacro:property name="steer_velocity"      value="2.0"/>
 
   <!-- Wheel spin limits (about +Y) -->
-  <xacro:property name="wheel_velocity"      value="50.0"/>
+  <xacro:property name="wheel_velocity"      value="28.0"/>
   <xacro:arg name="diff_joints" default="fixed"/>
   <xacro:property name="diff_activation"    value="$(arg diff_joints)"/> <!--set 'revolute' to enable differential bar motion -->
 
@@ -57,18 +57,16 @@
   <link name="chassis_link">
     <inertial>
       <origin xyz="0.011561 -0.031261 0.11152" rpy="0 0 0"/>
-      <mass value="9.7774"/>
-      <inertia ixx="0.41887" ixy="-0.00010081" ixz="1.9651E-06"
-               iyy="0.22572" iyz="-0.0056869"  izz="0.58468"/>
+      <mass value="41.71"/>
+      <inertia ixx="1.786883" ixy="-0.000430" ixz="0.000008"
+               iyy="0.962913" iyz="-0.024260"  izz="2.494222"/>
     </inertial>
     <visual>
       <origin xyz="0 0 -0.069175" rpy="0 0 0"/>
       <geometry>
         <mesh filename="package://rover_description/meshes/Chassis_link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.79216 0.81961 0.93333 1"/>
-      </material>
+      <material name="carbon_dark"><color rgba="0.13 0.13 0.15 1"/></material>
     </visual>
     <collision>
       <origin xyz="0 -0.07 0.2295" rpy="0 0 0"/>
@@ -99,9 +97,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/left_link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="gunmetal"><color rgba="0.28 0.29 0.32 1"/></material>
     </visual>
     <collision>
       <origin xyz="-0.003 0 0.009" rpy="0 0 0"/>
@@ -133,9 +129,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FLSteer_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
     </visual>
   </link>
 
@@ -161,9 +155,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FLWheel_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="tire_black"><color rgba="0.05 0.05 0.05 1"/></material>
     </visual>
     <collision>
       <origin xyz="0.055 0 0" rpy="0 1.5707963 0"/>
@@ -196,9 +188,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RLSteer_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
     </visual>
   </link>
 
@@ -224,9 +214,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RLWheel_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="tire_black"><color rgba="0.05 0.05 0.05 1"/></material>
     </visual>
     <collision>
       <origin xyz="0.055 0 0" rpy="0 1.5707963 0"/>
@@ -258,9 +246,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/LeftRod_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_silver"><color rgba="0.75 0.76 0.78 1"/></material>
     </visual>
   </link>
 
@@ -282,9 +268,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FirstBall_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
-      </material>
+      <material name="joint_black"><color rgba="0.10 0.10 0.10 1"/></material>
     </visual>
   </link>
 
@@ -306,9 +290,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/SecondBall_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
-      </material>
+      <material name="joint_black"><color rgba="0.10 0.10 0.10 1"/></material>
     </visual>
   </link>
 
@@ -330,9 +312,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/right_link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="gunmetal"><color rgba="0.28 0.29 0.32 1"/></material>
     </visual>
     <collision>
       <origin xyz="0.003 0 0.009" rpy="0 0 0"/>
@@ -364,9 +344,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FRSteer_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
     </visual>
   </link>
 
@@ -392,9 +370,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FRWheel_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="tire_black"><color rgba="0.05 0.05 0.05 1"/></material>
     </visual>
     <collision>
       <origin xyz="-0.055 0 0" rpy="0 1.5707963 0"/>
@@ -426,9 +402,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RRSteer_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
     </visual>
   </link>
 
@@ -454,9 +428,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RRWheel_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="tire_black"><color rgba="0.05 0.05 0.05 1"/></material>
     </visual>
     <collision>
       <origin xyz="-0.055 0 0" rpy="0 1.5707963 0"/>
@@ -489,9 +461,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RightRod_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
-      </material>
+      <material name="alu_silver"><color rgba="0.75 0.76 0.78 1"/></material>
     </visual>
   </link>
 
@@ -513,9 +483,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RearRightBall_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
-      </material>
+      <material name="joint_black"><color rgba="0.10 0.10 0.10 1"/></material>
     </visual>
   </link>
 
@@ -538,9 +506,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RearRightSecondBall_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.529411764705882 0.549019607843137 0.549019607843137 1"/>
-      </material>
+      <material name="joint_black"><color rgba="0.10 0.10 0.10 1"/></material>
     </visual>
   </link>
 
@@ -562,9 +528,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/Zed_Link.STL"/>
       </geometry>
-      <material name="">
-        <color rgba="0.627450980392157 0.627450980392157 0.627450980392157 1"/>
-      </material>
+      <material name="zed_navy"><color rgba="0.10 0.12 0.20 1"/></material>
     </visual>
   </link>
 

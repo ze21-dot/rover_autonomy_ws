@@ -5,8 +5,11 @@ Usage:
   ros2 launch rover_description gazebo_spawn.launch.py
   ros2 launch rover_description gazebo_spawn.launch.py diff_joints:=revolute   # enable rocker suspension
 """
+import os
+
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
 from launch_ros.actions import Node
@@ -18,6 +21,12 @@ def generate_launch_description():
     pkg = "rover_description"
     diff_joints = LaunchConfiguration("diff_joints")
 
+    # Let gz-sim resolve model://rover_description/... URIs without manual exports
+    share_parent = os.path.dirname(get_package_share_directory(pkg))
+    gz_resource_path = SetEnvironmentVariable(
+        name="GZ_SIM_RESOURCE_PATH",
+        value=os.environ.get("GZ_SIM_RESOURCE_PATH", "") + os.pathsep + share_parent)
+
     xacro_path = PathJoinSubstitution(
         [FindPackageShare(pkg), "urdf", "karasimsekURDF.urdf.xacro"])
 
@@ -26,6 +35,8 @@ def generate_launch_description():
         value_type=str)
 
     return LaunchDescription([
+        gz_resource_path,
+
         DeclareLaunchArgument("diff_joints", default_value="fixed",
                               description="fixed = frozen suspension (stable first spawn); revolute = rocker active"),
 
