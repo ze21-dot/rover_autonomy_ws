@@ -14,13 +14,15 @@ Single source of truth for rover geometry. All numbers below are **measured from
 | Track at wheel contact (W) | **0.834 m** | rocker offsets ±0.37 + steer/wheel x-offsets |
 | Wheel radius | **0.1465 m** | measured from wheel STL bounding box |
 | Wheel width | 0.11 m | wheel STL |
-| Steer joint limits | ±1.5708 rad (±90°) | xacro `steer_lower/upper` — **mechanical limit TBD (Barış), see below** |
-| Chassis mass | 9.78 kg | SolidWorks inertial export |
+| Steer joint limits | ±1.5708 rad (±90°) | **confirmed by mechanical team 2026-08-15** (cable-management constraint) |
+| Drive motors | CubeMars AK10-9 KV100 (×4) | per spec §4.1; wheel velocity limit 28 rad/s (~4.1 m/s) derived from KV100@24V / 9:1 |
+| Chassis mass | 41.71 kg | CAD 9.78 kg + ~31.9 kg internals (battery/motors/electronics not in CAD) |
+| **Total rover mass** | **59.06 kg** | target: real armless weight ≈ 55–64 kg (with arm 79 kg, mech. team); finalize on scale |
 | **min_turning_radius** | **R = L/2·cot(δ_max) + W/2 ≈ 0.417 m @ ±90°** | shared with Nav2 (§4.2); recompute when real δ_max lands |
 
-⚠️ `min_turning_radius` currently assumes joint-limit steering (±90°). Physical linkage (ball rods)
-may limit travel earlier — **pending answer from mechanical team**. Nav2 config must use the
-recomputed value, never this provisional one.
+Steer limit ±90° confirmed by the mechanical team (limited by cable management, not linkage).
+Chassis mass includes a lumped correction for internals absent from CAD; inertia scaled by the
+same ratio (uniform-density assumption) — refine when the assembled rover is weighed.
 
 ## Sim-hardening changes vs. raw SolidWorks export
 
