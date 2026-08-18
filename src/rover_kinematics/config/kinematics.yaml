@@ -1,0 +1,12 @@
+# CNV-5: all runtime configuration in version-controlled YAML.
+# Geometry values derive from rover_description (see its README) — keep in sync.
+ackermann_ik_node:
+  ros__parameters:
+    wheelbase: 0.882          # m, from URDF
+    track: 0.834              # m, wheel-contact track
+    wheel_radius: 0.1465      # m, measured from wheel STL
+    max_steer: 1.5708         # rad, confirmed +/-90 deg (mech team, 2026-08-15)
+    max_wheel_speed: 28.0     # rad/s, CubeMars AK10-9 KV100 @24V / 9:1
+    drive_axis_sign: -1.0     # wheel joints spin about model -X; -1 => +cmd_vel.x drives forward
+    steer_axis_sign: 1.0
+    cmd_timeout: 0.5          # s, drive watchdog

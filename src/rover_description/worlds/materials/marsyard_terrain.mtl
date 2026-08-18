@@ -1,0 +1,5 @@
+newmtl mars
+Ka 0.55 0.42 0.34
+Kd 1.0 1.0 1.0
+Ks 0.03 0.03 0.03
+map_Kd marsyard_albedo.png

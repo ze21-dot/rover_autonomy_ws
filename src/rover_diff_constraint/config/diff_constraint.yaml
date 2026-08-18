@@ -1,0 +1,13 @@
+diff_constraint:
+  ros__parameters:
+    # !!! URDF'teki GERCEK diff eklem adlarini yaz (ros2 topic echo /joint_states --once ile bak)
+    left_joint: "leftjoint"
+    right_joint: "rightjoint"
+    mode: "effort"            # effort (tercih) | position
+    kp: 400.0                  # yumusak basla; sallaniyorsa 2x artir, titriyorsa yari indir
+    kd: 20.0
+    max_effort: 60.0          # AK10-9 KV100 stall'in cok altinda kal
+    lp_alpha: 0.15            # sadece position modunda
+    rate_hz: 100.0
+    cmd_topic: "/diff_effort_controller/commands"
+    watchdog_timeout_s: 0.25
