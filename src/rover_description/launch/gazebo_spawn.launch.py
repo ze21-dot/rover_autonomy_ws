@@ -1,80 +1,67 @@
 #!/usr/bin/env python3
-"""GZ-2: spawn the rover into Gazebo Harmonic (empty world) with clock + joint_states bridged.
+"""Spawn Karasimsek into Gazebo Harmonic.
 
-Usage:
-  ros2 launch rover_description gazebo_spawn.launch.py
-  ros2 launch rover_description gazebo_spawn.launch.py diff_joints:=revolute   # enable rocker suspension
+  ros2 launch rover_description gazebo_spawn.launch.py                     # empty world
+  ros2 launch rover_description gazebo_spawn.launch.py world:=marsyard     # Mars-yard testbed
+  ... diff_joints:=revolute                                                # live rocker suspension
 """
 import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, SetEnvironmentVariable
+from launch.actions import (DeclareLaunchArgument, IncludeLaunchDescription,
+                            OpaqueFunction, SetEnvironmentVariable)
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
+from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 
 
-def generate_launch_description():
+def setup(context, *args, **kwargs):
     pkg = "rover_description"
-    diff_joints = LaunchConfiguration("diff_joints")
+    share = get_package_share_directory(pkg)
+    world = LaunchConfiguration("world").perform(context)
+    diff_joints = LaunchConfiguration("diff_joints").perform(context)
 
-    # Let gz-sim resolve model://rover_description/... URIs without manual exports
-    share_parent = os.path.dirname(get_package_share_directory(pkg))
-    gz_resource_path = SetEnvironmentVariable(
-        name="GZ_SIM_RESOURCE_PATH",
-        value=os.environ.get("GZ_SIM_RESOURCE_PATH", "") + os.pathsep + share_parent)
-
-    xacro_path = PathJoinSubstitution(
-        [FindPackageShare(pkg), "urdf", "karasimsekURDF.urdf.xacro"])
+    if world in ("empty", "empty.sdf"):
+        world_name, gz_world = "empty", "empty.sdf"
+    else:
+        world_name = world.replace(".sdf", "")
+        gz_world = os.path.join(share, "worlds", world_name + ".sdf")
 
     robot_description = ParameterValue(
-        Command(["xacro ", xacro_path, " diff_joints:=", diff_joints]),
+        Command(["xacro ", os.path.join(share, "urdf", "karasimsekURDF.urdf.xacro"),
+                 " diff_joints:=", diff_joints]),
         value_type=str)
 
-    return LaunchDescription([
-        gz_resource_path,
-
-        DeclareLaunchArgument("diff_joints", default_value="fixed",
-                              description="fixed = frozen suspension (stable first spawn); revolute = rocker active"),
-
-        # Gazebo Harmonic, empty world, autostart (-r)
+    return [
         IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(PathJoinSubstitution(
-                [FindPackageShare("ros_gz_sim"), "launch", "gz_sim.launch.py"])),
-            launch_arguments={"gz_args": "-r empty.sdf"}.items(),
-        ),
+            PythonLaunchDescriptionSource(os.path.join(
+                get_package_share_directory("ros_gz_sim"), "launch", "gz_sim.launch.py")),
+            launch_arguments={"gz_args": f"-r {gz_world}"}.items()),
+        Node(package="robot_state_publisher", executable="robot_state_publisher",
+             output="screen",
+             parameters=[{"use_sim_time": True, "robot_description": robot_description}]),
+        Node(package="ros_gz_sim", executable="create", output="screen",
+             arguments=["-topic", "robot_description", "-name", "karasimsek", "-z", "0.05"]),
+        Node(package="ros_gz_bridge", executable="parameter_bridge", output="screen",
+             arguments=[
+                 "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
+                 f"/world/{world_name}/model/karasimsek/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model"],
+             remappings=[(f"/world/{world_name}/model/karasimsek/joint_state", "/joint_states")],
+             parameters=[{"use_sim_time": True}]),
+    ]
 
-        Node(
-            package="robot_state_publisher",
-            executable="robot_state_publisher",
-            output="screen",
-            parameters=[{"use_sim_time": True,
-                         "robot_description": robot_description}],
-        ),
 
-        # Spawn from /robot_description, slightly above ground so it settles
-        Node(
-            package="ros_gz_sim",
-            executable="create",
-            output="screen",
-            arguments=["-topic", "robot_description",
-                       "-name", "karasimsek",
-                       "-z", "0.03"],
-        ),
-
-        # Bridges: sim clock (CNV-3) + joint states from the gz JointStatePublisher plugin
-        Node(
-            package="ros_gz_bridge",
-            executable="parameter_bridge",
-            output="screen",
-            arguments=[
-                "/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock",
-                "/world/empty/model/karasimsek/joint_state@sensor_msgs/msg/JointState[gz.msgs.Model",
-            ],
-            remappings=[("/world/empty/model/karasimsek/joint_state", "/joint_states")],
-            parameters=[{"use_sim_time": True}],
-        ),
+def generate_launch_description():
+    share_parent = os.path.dirname(get_package_share_directory("rover_description"))
+    return LaunchDescription([
+        SetEnvironmentVariable(
+            name="GZ_SIM_RESOURCE_PATH",
+            value=os.environ.get("GZ_SIM_RESOURCE_PATH", "") + os.pathsep + share_parent),
+        DeclareLaunchArgument("world", default_value="empty",
+                              description="empty | marsyard (from rover_description/worlds)"),
+        DeclareLaunchArgument("diff_joints", default_value="fixed",
+                              description="fixed | revolute (live rocker suspension)"),
+        OpaqueFunction(function=setup),
     ])
