@@ -1,0 +1,343 @@
+<?xml version="1.0"?>
+<!-- Mars-yard v4: crater/ridge/slope topography, irregular rocks, sunset light, tiled sand. -->
+<sdf version="1.8">
+  <world name="marsyard">
+    <physics name="default" type="dartsim"><max_step_size>0.001</max_step_size><real_time_factor>1.0</real_time_factor></physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <scene>
+      <ambient>0.34 0.28 0.24 1</ambient>
+      <background>0.82 0.58 0.42 1</background>
+      <grid>false</grid>
+      <shadows>true</shadows>
+    </scene>
+
+    <light type="directional" name="sun">
+      <pose>0 0 14 0 0 0</pose>
+      <direction>-0.65 0.18 -0.32</direction>
+      <diffuse>1.0 0.84 0.66 1</diffuse>
+      <specular>0.35 0.3 0.25 1</specular>
+      <cast_shadows>true</cast_shadows>
+    </light>
+
+    <model name="terrain"><static>true</static>
+      <link name="t">
+        <collision name="c">
+          <geometry><mesh><uri>model://rover_description/worlds/materials/marsyard_collision.stl</uri></mesh></geometry>
+          <surface><friction><ode><mu>1.1</mu><mu2>0.9</mu2></ode></friction></surface>
+        </collision>
+        <visual name="v">
+          <geometry><mesh><uri>model://rover_description/worlds/materials/marsyard_terrain.obj</uri></mesh></geometry>
+        </visual>
+      </link></model>
+
+    <model name="rock_0"><static>true</static>
+      <pose>15.86 16.01 0.64 0.15 0.16 0.28</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.47 0.47 0.47</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.47 0.47 0.47</scale></mesh></geometry>
+          <material><ambient>0.16 0.13 0.12 1</ambient>
+                    <diffuse>0.28 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_1"><static>true</static>
+      <pose>-23.46 25.96 0.09 0.17 0.39 5.57</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.55 0.55 0.55</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.55 0.55 0.55</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_2"><static>true</static>
+      <pose>17.90 -5.59 0.35 0.22 0.11 5.45</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry>
+          <material><ambient>0.19 0.16 0.14 1</ambient>
+                    <diffuse>0.34 0.28 0.23 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_3"><static>true</static>
+      <pose>-22.66 9.32 -0.11 0.36 0.35 0.11</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.68 0.68 0.68</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.68 0.68 0.68</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_4"><static>true</static>
+      <pose>10.79 -25.94 -0.10 0.13 0.32 1.96</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.47 0.47 0.47</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.47 0.47 0.47</scale></mesh></geometry>
+          <material><ambient>0.17 0.14 0.12 1</ambient>
+                    <diffuse>0.30 0.25 0.21 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_5"><static>true</static>
+      <pose>-18.25 10.32 -0.35 0.09 0.13 4.96</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.44 0.44 0.44</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.44 0.44 0.44</scale></mesh></geometry>
+          <material><ambient>0.20 0.17 0.15 1</ambient>
+                    <diffuse>0.36 0.29 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_6"><static>true</static>
+      <pose>-13.72 -25.24 0.02 0.15 0.38 2.48</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry>
+          <material><ambient>0.14 0.12 0.10 1</ambient>
+                    <diffuse>0.25 0.21 0.17 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_7"><static>true</static>
+      <pose>22.69 2.92 2.15 0.27 0.27 2.88</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.32 0.32 0.32</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.32 0.32 0.32</scale></mesh></geometry>
+          <material><ambient>0.20 0.16 0.14 1</ambient>
+                    <diffuse>0.35 0.29 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_8"><static>true</static>
+      <pose>-14.46 7.33 -0.83 0.15 0.32 1.20</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.24 0.24 0.24</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.24 0.24 0.24</scale></mesh></geometry>
+          <material><ambient>0.19 0.16 0.14 1</ambient>
+                    <diffuse>0.34 0.28 0.23 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_9"><static>true</static>
+      <pose>-5.70 15.49 0.08 0.25 0.38 6.15</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.40 0.40 0.40</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.40 0.40 0.40</scale></mesh></geometry>
+          <material><ambient>0.19 0.16 0.14 1</ambient>
+                    <diffuse>0.34 0.28 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_10"><static>true</static>
+      <pose>11.63 16.06 0.32 0.16 0.22 2.97</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.27 0.27 0.27</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.27 0.27 0.27</scale></mesh></geometry>
+          <material><ambient>0.19 0.16 0.14 1</ambient>
+                    <diffuse>0.34 0.28 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_11"><static>true</static>
+      <pose>23.84 -9.50 1.27 0.17 0.25 5.80</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.41 0.41 0.41</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.41 0.41 0.41</scale></mesh></geometry>
+          <material><ambient>0.14 0.11 0.10 1</ambient>
+                    <diffuse>0.24 0.20 0.17 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_12"><static>true</static>
+      <pose>22.03 -8.98 1.07 0.06 0.16 0.46</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.74 0.74 0.74</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.74 0.74 0.74</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.22 0.18 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_13"><static>true</static>
+      <pose>18.62 17.10 0.71 0.10 0.20 3.43</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.26 0.26 0.26</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock4.stl</uri><scale>0.26 0.26 0.26</scale></mesh></geometry>
+          <material><ambient>0.18 0.15 0.13 1</ambient>
+                    <diffuse>0.32 0.26 0.22 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_14"><static>true</static>
+      <pose>-20.47 18.95 -0.27 0.00 0.08 2.12</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.34 0.34 0.34</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.34 0.34 0.34</scale></mesh></geometry>
+          <material><ambient>0.17 0.14 0.13 1</ambient>
+                    <diffuse>0.30 0.25 0.21 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_15"><static>true</static>
+      <pose>22.26 20.27 0.86 0.27 0.34 2.09</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.45 0.45 0.45</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.45 0.45 0.45</scale></mesh></geometry>
+          <material><ambient>0.17 0.15 0.13 1</ambient>
+                    <diffuse>0.31 0.25 0.21 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_16"><static>true</static>
+      <pose>15.27 -5.25 -0.24 0.28 0.28 0.04</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.52 0.52 0.52</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.52 0.52 0.52</scale></mesh></geometry>
+          <material><ambient>0.19 0.16 0.14 1</ambient>
+                    <diffuse>0.35 0.29 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_17"><static>true</static>
+      <pose>-23.97 -18.25 0.07 0.02 0.09 3.73</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.30 0.30 0.30</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.30 0.30 0.30</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.22 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_18"><static>true</static>
+      <pose>20.08 -7.83 0.86 0.31 0.38 2.33</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.39 0.39 0.39</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.39 0.39 0.39</scale></mesh></geometry>
+          <material><ambient>0.17 0.14 0.12 1</ambient>
+                    <diffuse>0.30 0.25 0.21 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_19"><static>true</static>
+      <pose>10.75 -8.24 -0.62 0.35 0.20 4.50</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.65 0.65 0.65</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.65 0.65 0.65</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_20"><static>true</static>
+      <pose>1.82 -9.56 -0.20 0.21 0.19 5.17</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry>
+          <material><ambient>0.14 0.12 0.10 1</ambient>
+                    <diffuse>0.25 0.20 0.17 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_21"><static>true</static>
+      <pose>-24.95 2.96 -0.18 0.29 0.21 3.49</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry>
+          <material><ambient>0.18 0.15 0.13 1</ambient>
+                    <diffuse>0.33 0.27 0.22 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_22"><static>true</static>
+      <pose>-0.43 5.99 -0.11 0.08 0.40 4.63</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.32 0.32 0.32</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.32 0.32 0.32</scale></mesh></geometry>
+          <material><ambient>0.18 0.15 0.13 1</ambient>
+                    <diffuse>0.32 0.26 0.22 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_23"><static>true</static>
+      <pose>23.68 -10.71 1.27 0.02 0.01 1.53</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.43 0.43 0.43</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock3.stl</uri><scale>0.43 0.43 0.43</scale></mesh></geometry>
+          <material><ambient>0.16 0.13 0.11 1</ambient>
+                    <diffuse>0.28 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_24"><static>true</static>
+      <pose>18.79 -17.49 0.69 0.08 0.27 3.11</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.57 0.57 0.57</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.57 0.57 0.57</scale></mesh></geometry>
+          <material><ambient>0.16 0.13 0.11 1</ambient>
+                    <diffuse>0.28 0.23 0.19 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_25"><static>true</static>
+      <pose>-11.73 -0.61 -0.02 0.29 0.10 1.20</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry>
+          <material><ambient>0.15 0.13 0.11 1</ambient>
+                    <diffuse>0.27 0.22 0.18 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_26"><static>true</static>
+      <pose>-9.16 -21.18 -0.20 0.00 0.02 1.33</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.71 0.71 0.71</scale></mesh></geometry>
+          <material><ambient>0.16 0.14 0.12 1</ambient>
+                    <diffuse>0.29 0.24 0.20 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_27"><static>true</static>
+      <pose>-4.28 5.28 -0.08 0.10 0.24 5.71</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.74 0.74 0.74</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.74 0.74 0.74</scale></mesh></geometry>
+          <material><ambient>0.21 0.17 0.15 1</ambient>
+                    <diffuse>0.37 0.30 0.25 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_28"><static>true</static>
+      <pose>-20.72 18.41 -0.23 0.25 0.20 0.65</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.41 0.41 0.41</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.41 0.41 0.41</scale></mesh></geometry>
+          <material><ambient>0.20 0.17 0.15 1</ambient>
+                    <diffuse>0.35 0.29 0.24 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_29"><static>true</static>
+      <pose>13.51 16.79 0.47 0.38 0.15 5.45</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.46 0.46 0.46</scale></mesh></geometry>
+          <material><ambient>0.17 0.14 0.12 1</ambient>
+                    <diffuse>0.30 0.24 0.20 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_30"><static>true</static>
+      <pose>-4.23 -6.58 -0.10 0.09 0.02 3.36</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.39 0.39 0.39</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock2.stl</uri><scale>0.39 0.39 0.39</scale></mesh></geometry>
+          <material><ambient>0.14 0.12 0.10 1</ambient>
+                    <diffuse>0.25 0.21 0.17 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_31"><static>true</static>
+      <pose>-3.01 -24.69 -0.10 0.05 0.15 5.89</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.27 0.27 0.27</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock1.stl</uri><scale>0.27 0.27 0.27</scale></mesh></geometry>
+          <material><ambient>0.21 0.18 0.15 1</ambient>
+                    <diffuse>0.37 0.31 0.26 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_32"><static>true</static>
+      <pose>-20.11 -4.69 -0.18 0.37 0.27 1.62</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.64 0.64 0.64</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.64 0.64 0.64</scale></mesh></geometry>
+          <material><ambient>0.14 0.12 0.10 1</ambient>
+                    <diffuse>0.24 0.20 0.17 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+    <model name="rock_33"><static>true</static>
+      <pose>-1.03 -13.05 -0.35 0.03 0.21 1.14</pose>
+      <link name="b">
+        <collision name="c"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.69 0.69 0.69</scale></mesh></geometry></collision>
+        <visual name="v"><geometry><mesh><uri>model://rover_description/worlds/materials/rock0.stl</uri><scale>0.69 0.69 0.69</scale></mesh></geometry>
+          <material><ambient>0.21 0.18 0.16 1</ambient>
+                    <diffuse>0.38 0.31 0.26 1</diffuse>
+                    <specular>0.08 0.07 0.06 1</specular></material></visual>
+      </link></model>
+  </world>
+</sdf>
