@@ -610,4 +610,14 @@
     </plugin>
   </gazebo>
 
+  <gazebo>
+    <plugin filename="gz-sim-apply-joint-force-system" name="gz::sim::systems::ApplyJointForce">
+      <joint_name>leftjoint</joint_name>
+    </plugin>
+  </gazebo>
+  <gazebo>
+    <plugin filename="gz-sim-apply-joint-force-system" name="gz::sim::systems::ApplyJointForce">
+      <joint_name>rightjoint</joint_name>
+    </plugin>
+  </gazebo>
 </robot>
