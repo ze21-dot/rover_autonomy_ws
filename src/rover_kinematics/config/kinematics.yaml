@@ -3,7 +3,7 @@
 ackermann_ik_node:
   ros__parameters:
     wheelbase: 0.882          # m, from URDF
-    track: 0.834              # m, wheel-contact track
+    track: 0.725           # m, STEER-AXIS track (rocker +/-0.37 + steer offset -/+0.0077, URDF origins). NOT wheel-contact 0.834 - Ackermann needs kingpin track. Fixed 2026-08-19.
     wheel_radius: 0.1465      # m, measured from wheel STL
     max_steer: 1.5708         # rad, confirmed +/-90 deg (mech team, 2026-08-15)
     max_wheel_speed: 28.0     # rad/s, CubeMars AK10-9 KV100 @24V / 9:1
