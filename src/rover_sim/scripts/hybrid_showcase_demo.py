@@ -16,20 +16,10 @@ sun = UsdLux.DistantLight.Define(stage, "/World/Sun")
 sun.CreateIntensityAttr(3400); sun.CreateColorAttr(Gf.Vec3f(1.0, 0.97, 0.94))
 UsdGeom.Xformable(sun.GetPrim()).AddRotateXYZOp().Set(Gf.Vec3f(-28, 45, 0))
 dome = UsdLux.DomeLight.Define(stage, "/World/Sky")
-dome.CreateIntensityAttr(200); dome.CreateColorAttr(Gf.Vec3f(0.62, 0.60, 0.58))
+dome.CreateIntensityAttr(240); dome.CreateColorAttr(Gf.Vec3f(0.80, 0.52, 0.36))
 mars = np.array([0.50, 0.25, 0.13])
 GroundPlane("/World/floor", z_position=0.0, color=mars)
-sky = UsdGeom.Sphere.Define(stage, "/World/mars_sky")
-sky.CreateRadiusAttr(120.0)
-UsdGeom.Xformable(sky.GetPrim()).AddTranslateOp().Set(Gf.Vec3d(0,0,0))
-skym = UsdShade.Material.Define(stage, "/World/skymat")
-skys = UsdShade.Shader.Define(stage, "/World/skymat/s")
-skys.CreateIdAttr("UsdPreviewSurface")
-skys.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.72, 0.45, 0.30))
-skys.CreateInput("emissiveColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.55, 0.32, 0.20))
-skys.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(1.0)
-skym.CreateSurfaceOutput().ConnectToSource(skys.ConnectableAPI(), "surface")
-UsdShade.MaterialBindingAPI.Apply(sky.GetPrim()).Bind(skym)
+
 
 heights = [0.03, 0.04, 0.06, 0.08, 0.10, 0.13, 0.16, 0.20, 0.23, 0.26]
 x = 1.5; random.seed(3)
@@ -74,10 +64,9 @@ def paint_link(link, rgb):
     sh.CreateIdAttr("UsdPreviewSurface")
     sh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*rgb))
     dark = sum(rgb) < 0.9
-    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.18 if dark else 0.4)
-    sh.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.85 if sum(rgb) > 2.0 else (0.45 if dark else 0.1))
-    if dark:
-        sh.CreateInput("specularColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(0.5,0.5,0.5))
+    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.45 if dark else 0.4)
+    sh.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.85 if sum(rgb) > 2.0 else (0.08 if dark else 0.1))
+
     m.CreateSurfaceOutput().ConnectToSource(sh.ConnectableAPI(), "surface")
     c = 0
     for p in stage.Traverse():
