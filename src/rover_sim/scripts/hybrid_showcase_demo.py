@@ -2,6 +2,7 @@ from isaacsim import SimulationApp
 app = SimulationApp({"headless": True, "renderer": "RaytracedLighting"})
 import numpy as np, random, os, omni.kit.commands
 import omni.replicator.core as rep
+import xml.etree.ElementTree as ET
 from isaacsim.core.api import World
 from isaacsim.core.api.objects import GroundPlane, FixedSphere, FixedCuboid
 from isaacsim.core.prims import Articulation
@@ -11,7 +12,6 @@ from pxr import UsdPhysics, UsdGeom, UsdLux, UsdShade, Sdf, Gf
 HYB = os.environ.get("HYB", "1") == "1"
 world = World(stage_units_in_meters=1.0, physics_dt=1/120.0, rendering_dt=1/30.0)
 stage = get_context().get_stage()
-
 sun = UsdLux.DistantLight.Define(stage, "/World/Sun")
 sun.CreateIntensityAttr(3400); sun.CreateColorAttr(Gf.Vec3f(1.0, 0.97, 0.94))
 UsdGeom.Xformable(sun.GetPrim()).AddRotateXYZOp().Set(Gf.Vec3f(-28, 45, 0))
@@ -19,7 +19,6 @@ dome = UsdLux.DomeLight.Define(stage, "/World/Sky")
 dome.CreateIntensityAttr(240); dome.CreateColorAttr(Gf.Vec3f(0.80, 0.52, 0.36))
 mars = np.array([0.50, 0.25, 0.13])
 GroundPlane("/World/floor", z_position=0.0, color=mars)
-
 
 heights = [0.03, 0.04, 0.06, 0.08, 0.10, 0.13, 0.16, 0.20, 0.23, 0.26]
 x = 1.5; random.seed(3)
@@ -38,47 +37,34 @@ cfg.merge_fixed_joints=False; cfg.fix_base=False; cfg.make_default_prim=False
 omni.kit.commands.execute("URDFParseAndImportFile",
     urdf_path="/workspace/robot/karasimsek_isaac.urdf", import_config=cfg)
 for _ in range(8): app.update()
-root = [str(p.GetPath()) for p in stage.Traverse() if p.HasAPI(UsdPhysics.ArticulationRootAPI)][0]
-rtop = root.rsplit("/",1)[0]
 
-import xml.etree.ElementTree as ET
-_tree = ET.parse("/workspace/robot/karasimsek_isaac.urdf")
-_mats = {}
-for _m in _tree.getroot().findall("material"):
-    _c = _m.find("color")
-    if _c is not None:
-        _mats[_m.get("name")] = [float(v) for v in _c.get("rgba").split()[:3]]
-_link_color = {}
-for _l in _tree.getroot().findall("link"):
-    _v = _l.find("visual")
-    if _v is None: continue
-    _vm = _v.find("material")
-    if _vm is None: continue
-    _c = _vm.find("color")
-    rgb = [float(v) for v in _c.get("rgba").split()[:3]] if _c is not None else _mats.get(_vm.get("name"))
-    if rgb: _link_color[_l.get("name")] = rgb
-print(f"URDF materials found for {len(_link_color)} links")
-def paint_link(link, rgb):
-    m = UsdShade.Material.Define(stage, f"/World/mat_{link}")
-    sh = UsdShade.Shader.Define(stage, f"/World/mat_{link}/s")
-    sh.CreateIdAttr("UsdPreviewSurface")
-    sh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*rgb))
-    dark = sum(rgb) < 0.9
-    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.45 if dark else 0.4)
-    sh.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.85 if sum(rgb) > 2.0 else (0.08 if dark else 0.1))
+deinst = 0
+for p in stage.Traverse():
+    if p.IsInstance():
+        p.SetInstanceable(False); deinst += 1
+for _ in range(4): app.update()
+print(f"instances disabled: {deinst}")
 
-    m.CreateSurfaceOutput().ConnectToSource(sh.ConnectableAPI(), "surface")
-    c = 0
+tree = ET.parse("/workspace/robot/karasimsek_isaac.urdf")
+link_color = {}
+for l in tree.getroot().findall("link"):
+    v = l.find("visual")
+    if v is None: continue
+    vm = v.find("material")
+    if vm is None: continue
+    c = vm.find("color")
+    if c is not None:
+        link_color[l.get("name")] = [float(x)**2.2 for x in c.get("rgba").split()[:3]]
+total = 0
+for link, rgb in link_color.items():
     for p in stage.Traverse():
-        pp = str(p.GetPath())
-        if "/visuals/" in pp and p.GetTypeName() == "Mesh" and link.lower() in pp.lower():
-            UsdShade.MaterialBindingAPI.Apply(p).Bind(m); c += 1
-    return c
-_total = 0
-for _link, _rgb in _link_color.items():
-    _total += paint_link(_link, _rgb)
-print(f"painted {_total} meshes from URDF materials")
+        if p.GetTypeName() == "Mesh" and link.lower() in str(p.GetPath()).lower():
+            UsdShade.MaterialBindingAPI.Apply(p).UnbindAllBindings()
+            UsdGeom.Gprim(p).CreateDisplayColorAttr([Gf.Vec3f(*rgb)])
+            total += 1
+print(f"painted {total} meshes via displayColor (sRGB-to-linear)")
 
+root = [str(p.GetPath()) for p in stage.Traverse() if p.HasAPI(UsdPhysics.ArticulationRootAPI)][0]
 world.reset()
 r = Articulation(root); r.initialize()
 r.set_world_poses(positions=np.array([[6.5, 0.0, 0.45]]))
@@ -90,8 +76,6 @@ kps = np.zeros((1,len(n))); kds = np.zeros((1,len(n)))
 for i in W: kds[0,i] = 800.0
 for i in S: kps[0,i], kds[0,i] = 5000.0, 200.0
 r.set_gains(kps=kps, kds=kds)
-try: r.set_max_efforts(np.full((1,len(n)), 120.0))
-except Exception: pass
 
 for _ in range(360):
     q0 = r.get_joint_positions()[0]
@@ -101,6 +85,7 @@ for _ in range(360):
 
 cam = rep.create.camera(position=(8.6, 2.1, 0.65), look_at=(-2.0, 0, 0.30), focal_length=35.0)
 rprod = rep.create.render_product(cam, (1920,1080))
+for _ in range(90): world.step(render=True)
 wr = rep.WriterRegistry.get("BasicWriter")
 wr.initialize(output_dir="/workspace/frames", rgb=True); wr.attach([rprod])
 
@@ -123,6 +108,6 @@ for t in range(750):
     if stall > 100: stopped = True
     world.step(render=True)
 d = r.get_world_poses()[0][0]-p0
-print(f"MOD={'ON' if HYB else 'OFF'}  distance={-d[0]:.2f} m  max|e|={emax:.3f} rad")
+print(f"MODE={'ON' if HYB else 'OFF'}  distance={-d[0]:.2f} m  max|e|={emax:.3f} rad")
 print("=== SHOWCASE RUN COMPLETE ===")
 app.close()
