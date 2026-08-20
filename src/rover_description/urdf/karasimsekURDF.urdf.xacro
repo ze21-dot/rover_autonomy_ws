@@ -129,7 +129,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FLSteer_Link.STL"/>
       </geometry>
-      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
+      <material name="alu_bright"><color rgba="0.45 0.46 0.48 1"/></material>
     </visual>
   </link>
 
@@ -188,7 +188,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RLSteer_Link.STL"/>
       </geometry>
-      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
+      <material name="alu_bright"><color rgba="0.45 0.46 0.48 1"/></material>
     </visual>
   </link>
 
@@ -246,7 +246,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/LeftRod_Link.STL"/>
       </geometry>
-      <material name="alu_silver"><color rgba="0.75 0.76 0.78 1"/></material>
+      <material name="alu_silver"><color rgba="0.42 0.43 0.45 1"/></material>
     </visual>
   </link>
 
@@ -344,7 +344,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/FRSteer_Link.STL"/>
       </geometry>
-      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
+      <material name="alu_bright"><color rgba="0.45 0.46 0.48 1"/></material>
     </visual>
   </link>
 
@@ -402,7 +402,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RRSteer_Link.STL"/>
       </geometry>
-      <material name="alu_bright"><color rgba="0.78 0.79 0.81 1"/></material>
+      <material name="alu_bright"><color rgba="0.45 0.46 0.48 1"/></material>
     </visual>
   </link>
 
@@ -461,7 +461,7 @@
       <geometry>
         <mesh filename="package://rover_description/meshes/RightRod_Link.STL"/>
       </geometry>
-      <material name="alu_silver"><color rgba="0.75 0.76 0.78 1"/></material>
+      <material name="alu_silver"><color rgba="0.42 0.43 0.45 1"/></material>
     </visual>
   </link>
 
