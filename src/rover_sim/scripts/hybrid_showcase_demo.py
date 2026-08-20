@@ -13,10 +13,10 @@ world = World(stage_units_in_meters=1.0, physics_dt=1/120.0, rendering_dt=1/30.0
 stage = get_context().get_stage()
 
 sun = UsdLux.DistantLight.Define(stage, "/World/Sun")
-sun.CreateIntensityAttr(3500); sun.CreateColorAttr(Gf.Vec3f(1.0, 0.62, 0.42))
+sun.CreateIntensityAttr(3200); sun.CreateColorAttr(Gf.Vec3f(1.0, 0.93, 0.85))
 UsdGeom.Xformable(sun.GetPrim()).AddRotateXYZOp().Set(Gf.Vec3f(-28, 45, 0))
 dome = UsdLux.DomeLight.Define(stage, "/World/Sky")
-dome.CreateIntensityAttr(350); dome.CreateColorAttr(Gf.Vec3f(0.85, 0.5, 0.35))
+dome.CreateIntensityAttr(280); dome.CreateColorAttr(Gf.Vec3f(0.75, 0.62, 0.52))
 mars = np.array([0.50, 0.25, 0.13])
 GroundPlane("/World/floor", z_position=0.0, color=mars)
 
@@ -62,7 +62,9 @@ def paint_link(link, rgb):
     sh = UsdShade.Shader.Define(stage, f"/World/mat_{link}/s")
     sh.CreateIdAttr("UsdPreviewSurface")
     sh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*rgb))
-    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.5)
+    dark = sum(rgb) < 0.9
+    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.25 if dark else 0.45)
+    sh.CreateInput("metallic", Sdf.ValueTypeNames.Float).Set(0.6 if not dark and sum(rgb) > 2.0 else (0.3 if dark else 0.1))
     m.CreateSurfaceOutput().ConnectToSource(sh.ConnectableAPI(), "surface")
     c = 0
     for p in stage.Traverse():
