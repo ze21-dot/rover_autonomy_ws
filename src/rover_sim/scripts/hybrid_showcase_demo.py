@@ -50,9 +50,9 @@ def paint(kw, rgb, rough=0.55):
     c = 0
     for p in stage.Traverse():
         pp = str(p.GetPath())
-        if pp.startswith(rtop) and kw.lower() in pp.lower() and p.GetTypeName()=="Mesh":
+        if "/visuals/" in pp and kw.lower() in pp.lower() and p.GetTypeName()=="Mesh":
             UsdShade.MaterialBindingAPI.Apply(p).Bind(m); c += 1
-    print(f"boya {kw}: {c}")
+    print(f"painted {kw}: {c} meshes")
 paint("Wheel", (0.06,0.06,0.07), 0.8)
 paint("Chassis", (0.72,0.73,0.76), 0.35); paint("chassis", (0.72,0.73,0.76), 0.35)
 paint("Steer", (0.75,0.12,0.10))
@@ -104,6 +104,6 @@ for t in range(750):
     if stall > 100: stopped = True
     world.step(render=True)
 d = r.get_world_poses()[0][0]-p0
-print(f"MOD={'ON' if HYB else 'OFF'}  yol={-d[0]:.2f} m  max|e|={emax:.3f} rad")
-print("=== SHOWCASE TAMAM ===")
+print(f"MOD={'ON' if HYB else 'OFF'}  distance={-d[0]:.2f} m  max|e|={emax:.3f} rad")
+print("=== SHOWCASE RUN COMPLETE ===")
 app.close()
