@@ -40,25 +40,40 @@ for _ in range(8): app.update()
 root = [str(p.GetPath()) for p in stage.Traverse() if p.HasAPI(UsdPhysics.ArticulationRootAPI)][0]
 rtop = root.rsplit("/",1)[0]
 
-def paint(kw, rgb, rough=0.55):
-    m = UsdShade.Material.Define(stage, f"/World/pm_{kw}")
-    sh = UsdShade.Shader.Define(stage, f"/World/pm_{kw}/s")
+import xml.etree.ElementTree as ET
+_tree = ET.parse("/workspace/robot/karasimsek_isaac.urdf")
+_mats = {}
+for _m in _tree.getroot().findall("material"):
+    _c = _m.find("color")
+    if _c is not None:
+        _mats[_m.get("name")] = [float(v) for v in _c.get("rgba").split()[:3]]
+_link_color = {}
+for _l in _tree.getroot().findall("link"):
+    _v = _l.find("visual")
+    if _v is None: continue
+    _vm = _v.find("material")
+    if _vm is None: continue
+    _c = _vm.find("color")
+    rgb = [float(v) for v in _c.get("rgba").split()[:3]] if _c is not None else _mats.get(_vm.get("name"))
+    if rgb: _link_color[_l.get("name")] = rgb
+print(f"URDF materials found for {len(_link_color)} links")
+def paint_link(link, rgb):
+    m = UsdShade.Material.Define(stage, f"/World/mat_{link}")
+    sh = UsdShade.Shader.Define(stage, f"/World/mat_{link}/s")
     sh.CreateIdAttr("UsdPreviewSurface")
     sh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).Set(Gf.Vec3f(*rgb))
-    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(rough)
+    sh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(0.5)
     m.CreateSurfaceOutput().ConnectToSource(sh.ConnectableAPI(), "surface")
     c = 0
     for p in stage.Traverse():
         pp = str(p.GetPath())
-        if "/visuals/" in pp and kw.lower() in pp.lower() and p.GetTypeName()=="Mesh":
+        if "/visuals/" in pp and p.GetTypeName() == "Mesh" and link.lower() in pp.lower():
             UsdShade.MaterialBindingAPI.Apply(p).Bind(m); c += 1
-    print(f"painted {kw}: {c} meshes")
-paint("Wheel", (0.06,0.06,0.07), 0.8)
-paint("Chassis", (0.72,0.73,0.76), 0.35); paint("chassis", (0.72,0.73,0.76), 0.35)
-paint("Steer", (0.75,0.12,0.10))
-paint("Rod", (0.30,0.31,0.34)); paint("Ball", (0.30,0.31,0.34)); paint("Differential", (0.30,0.31,0.34))
-paint("left_link", (0.20,0.21,0.24)); paint("right_link", (0.20,0.21,0.24))
-paint("Zed", (0.10,0.10,0.12))
+    return c
+_total = 0
+for _link, _rgb in _link_color.items():
+    _total += paint_link(_link, _rgb)
+print(f"painted {_total} meshes from URDF materials")
 
 world.reset()
 r = Articulation(root); r.initialize()
