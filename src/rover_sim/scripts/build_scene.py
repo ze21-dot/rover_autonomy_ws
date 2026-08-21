@@ -17,7 +17,7 @@ import os, numpy as np
 from PIL import Image
 
 # ---------------------------------------------------------------- sky texture
-SKY = "/workspace/assets/sky_latlong.png"
+SKY = "/tmp/sky_unused.png"   # in-script generator neutralized; dome uses sky_v6.png
 W, H = 1024, 512
 img = np.zeros((H, W, 3), np.float32)
 top = np.array([0.55, 0.26, 0.10]); hor = np.array([0.95, 0.55, 0.28]); gnd = np.array([0.70, 0.38, 0.20])
@@ -41,9 +41,9 @@ UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
 
 # ------------------------------------------------------------------- lighting
 dome = UsdLux.DomeLight.Define(stage, "/World/Sky")
-dome.CreateIntensityAttr(560)
+dome.CreateIntensityAttr(320)
 dome.CreateColorAttr(Gf.Vec3f(1.0, 0.72, 0.48))          # dusty rust light bath
-dome.CreateTextureFileAttr(SKY)
+dome.CreateTextureFileAttr("/workspace/assets/sky_v6.png")
 dome.CreateTextureFormatAttr("latlong")
 
 # ---------------------------------------------------------- terrain heightmap
@@ -75,6 +75,9 @@ for _ in range(7):
     Z += -amp*np.exp(-d2/(2*sig*sig)) + 0.4*amp*np.exp(-d2/(2*(1.8*sig)**2))
 # --- mountains as a separate visual layer (dust-beige, smooth) -----------
 MOUNT = Z.copy()          # snapshot: ridge-only heights (before corridor flatten)
+# signature crater: raised rim, camera-visible midfield (Mars Yard zone-4 style)
+_cd2 = (X - 16.0)**2 + (Y + 4.0)**2
+Z += -1.55*np.exp(-_cd2/(2*2.6**2)) + 0.85*np.exp(-_cd2/(2*4.1**2))
 # flatten drive corridor so traverse physics stay clean
 corr = np.exp(-((np.clip(np.abs(Y)-1.8, 0, None))**2) / (2*2.0**2)) * ((X > 16) & (X < 44))
 Z *= (1.0 - 0.85 * corr)
@@ -94,7 +97,7 @@ for i in range(N-1):
         idx += [a, a+1, a+N+1, a+N]; cts.append(4)
 mesh.CreateFaceVertexIndicesAttr(idx); mesh.CreateFaceVertexCountsAttr(cts)
 uv = UsdGeom.PrimvarsAPI(mesh).CreatePrimvar("st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.vertex)
-uv.Set([Gf.Vec2f(float(p[0])/6.0, float(p[1])/6.0) for p in pts])   # 6 m tiling
+uv.Set([Gf.Vec2f(float(p[0])/24.0, float(p[1])/24.0) for p in pts])   # 6 m tiling
 UsdPhysics.CollisionAPI.Apply(mesh.GetPrim())
 print(f"[scene] terrain built: {N}x{N} verts, ridge+craters, corridor flattened")
 
@@ -104,7 +107,7 @@ sh  = UsdShade.Shader.Define(stage, "/World/Looks/mars_ground/pbr")
 sh.CreateIdAttr("UsdPreviewSurface")
 tex = UsdShade.Shader.Define(stage, "/World/Looks/mars_ground/tex")
 tex.CreateIdAttr("UsdUVTexture")
-tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set("/workspace/assets/ground/Ground054_4K-JPG_Color.jpg")
+tex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set("/workspace/assets/ground/mars_ground_baked.jpg")  # pattern baked in
 tex.CreateInput("wrapS", Sdf.ValueTypeNames.Token).Set("repeat")
 tex.CreateInput("wrapT", Sdf.ValueTypeNames.Token).Set("repeat")
 rdr = UsdShade.Shader.Define(stage, "/World/Looks/mars_ground/st")
@@ -125,26 +128,27 @@ hm = UsdGeom.Mesh.Define(stage, "/World/hills")
 hp = np.stack([X, Y, Z + 0.15], -1)[hill_mask.any(axis=1)].reshape(-1, 3) if False else None
 # simpler: full grid duplicate, but flatten non-hill zone below ground so it hides
 _und = 0.35*np.sin(X*0.55 + 1.7)*np.cos(Y*0.38) + 0.22*np.sin(Y*0.9 + 0.6)
-Zh = np.where(X < -6, Z + 0.12 + _und*np.clip((-6 - X)/8.0, 0, 1), Z - 5.0)
+_blend = np.clip((-6 - X)/6.0, 0, 1)          # 0 at edge -> 1 deep in hills
+Zh = Z + (0.30 + 0.9*np.clip(_und, -0.15, 0.6)*_blend)*_blend - 0.55*(1.0 - np.clip(_blend*2.2, 0, 1))
 hpts = np.stack([X, Y, Zh], -1).reshape(-1, 3)
 hm.CreatePointsAttr([Gf.Vec3f(*p) for p in hpts.astype(float)])
 hm.CreateFaceVertexIndicesAttr(idx); hm.CreateFaceVertexCountsAttr(cts)
 huv = UsdGeom.PrimvarsAPI(hm).CreatePrimvar("st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.vertex)
-huv.Set([Gf.Vec2f(float(p[0])/18.0, float(p[1])/18.0) for p in hpts])
+huv.Set([Gf.Vec2f(float(p[0])/8.0, float(p[1])/8.0) for p in hpts])
 UsdGeom.Gprim(hm.GetPrim()).CreateDisplayColorAttr([Gf.Vec3f(0.52, 0.34, 0.20)])   # dust-beige
 hmat = UsdShade.Material.Define(stage, "/World/Looks/dust_hills")
 hsh = UsdShade.Shader.Define(stage, "/World/Looks/dust_hills/pbr")
 hsh.CreateIdAttr("UsdPreviewSurface")
 htex = UsdShade.Shader.Define(stage, "/World/Looks/dust_hills/tex")
 htex.CreateIdAttr("UsdUVTexture")
-htex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set("/workspace/assets/ground/Ground054_4K-JPG_Color.jpg")
+htex.CreateInput("file", Sdf.ValueTypeNames.Asset).Set("/workspace/assets/ground/hills_clean.jpg")  # hills: clean texture
 htex.CreateInput("wrapS", Sdf.ValueTypeNames.Token).Set("repeat")
 htex.CreateInput("wrapT", Sdf.ValueTypeNames.Token).Set("repeat")
 hrdr = UsdShade.Shader.Define(stage, "/World/Looks/dust_hills/st")
 hrdr.CreateIdAttr("UsdPrimvarReader_float2")
 hrdr.CreateInput("varname", Sdf.ValueTypeNames.Token).Set("st")
 htex.CreateInput("st", Sdf.ValueTypeNames.Float2).ConnectToSource(hrdr.ConnectableAPI(), "result")
-htex.CreateInput("scale", Sdf.ValueTypeNames.Float4).Set(Gf.Vec4f(1.05, 0.78, 0.58, 1.0))   # pale sand-beige
+htex.CreateInput("scale", Sdf.ValueTypeNames.Float4).Set(Gf.Vec4f(1.30, 0.95, 0.70, 1.0))   # pale sand-beige
 hsh.CreateInput("diffuseColor", Sdf.ValueTypeNames.Color3f).ConnectToSource(htex.ConnectableAPI(), "rgb")
 hsh.CreateInput("roughness", Sdf.ValueTypeNames.Float).Set(1.0)
 hmat.CreateSurfaceOutput().ConnectToSource(hsh.ConnectableAPI(), "surface")
@@ -155,12 +159,24 @@ print("[scene] distant hills layered with dust-beige material")
 _gx, _gy = np.gradient(Z)
 _slope = np.clip(np.hypot(_gx, _gy) * 3.0, 0, 1)
 _r3 = np.random.default_rng(11)
-_patch = np.zeros_like(Z)
-for _ in range(26):                                   # bright dust pools
-    pcx, pcy = _r3.uniform(0, 44), _r3.uniform(-30, 30)
-    _patch += _r3.uniform(0.10, 0.28) * np.exp(-((X-pcx)**2 + (Y-pcy)**2) / (2*_r3.uniform(2.0, 6.0)**2))
-_crack = 0.12 * (np.sin(X*1.7 + Y*2.3) * np.sin(X*0.7 - Y*1.1) < -0.72)   # dark crack bands
-_mod = np.clip(1.0 + _patch - _crack - 0.25*_slope, 0.55, 1.45)
+# wind-swept banding: low-frequency stripes flowing across the view, gently curved
+_band_axis = X*0.32 + Y*0.9                            # stripe direction
+_wobble = 1.8*np.sin(X*0.18 + 1.1) + 1.2*np.sin(Y*0.11 - 0.7)
+_patch = (0.16*np.sin(_band_axis*0.55 + _wobble)
+        + 0.10*np.sin(_band_axis*1.35 + _wobble*1.7 + 2.4)
+        + 0.05*np.sin(_band_axis*3.1 + 0.9))
+_c1 = (np.sin(X*1.7 + Y*2.3) * np.sin(X*0.7 - Y*1.1) < -0.55)
+_c2 = (np.sin(X*3.1 - Y*1.9 + 2.2) * np.sin(X*1.3 + Y*2.7) < -0.62)
+_crack = 0.30*_c1 + 0.22*_c2                      # deeper, denser crack network   # dark crack bands
+# Voronoi-edge plate cracks (Curiosity mudstone reference), kept subtle
+_vr = np.random.default_rng(23)
+_seeds = np.stack([_vr.uniform(xs[0], xs[-1], 260), _vr.uniform(ys[0], ys[-1], 260)], 1)
+_P2 = np.stack([X.ravel(), Y.ravel()], 1)
+_d = np.sqrt(((_P2[:, None, :] - _seeds[None, :, :])**2).sum(-1))
+_d.sort(axis=1)
+_edge = np.clip(1.0 - (_d[:, 1] - _d[:, 0]) / 0.28, 0, 1).reshape(X.shape)   # 1 at plate borders
+_plates = 0.20 * (_edge ** 2.2)
+_mod = np.clip(1.0 + _patch - _crack - _plates - 0.25*_slope, 0.55, 1.45)
 _base = np.array([0.42, 0.20, 0.10])
 _cols = (_base[None, :] * _mod.reshape(-1, 1)).astype(float)
 _dc = UsdGeom.Gprim(mesh.GetPrim()).CreateDisplayColorAttr()
@@ -173,13 +189,14 @@ print("[scene] ground material bound (photogrammetric color, mars tint)")
 def make_rock(path, seed, radius):
     """Displaced icosphere — guaranteed-renderable rock stand-in."""
     r = np.random.default_rng(seed)
-    n_lat, n_lon = 10, 14
+    n_lat, n_lon = 18, 24
     ps, ii, cc = [], [], []
     for a in range(n_lat+1):
         th = np.pi * a / n_lat
         for b in range(n_lon):
             ph = 2*np.pi * b / n_lon
-            noise = 1.0 + r.uniform(-0.28, 0.28)
+            noise = (1.0 + 0.15*np.sin(2*th + 3*ph + seed) * r.uniform(0.6, 1.0)
+                         + r.uniform(-0.05, 0.05))          # two-octave: bulk + fine
             v = np.array([np.sin(th)*np.cos(ph), np.sin(th)*np.sin(ph), np.cos(th)*0.72]) * radius * noise
             ps.append(Gf.Vec3f(*v.astype(float)))
     for a in range(n_lat):
@@ -188,27 +205,54 @@ def make_rock(path, seed, radius):
             ii += [p0,p1,p2,p3]; cc.append(4)
     m = UsdGeom.Mesh.Define(stage, path)
     m.CreatePointsAttr(ps); m.CreateFaceVertexIndicesAttr(ii); m.CreateFaceVertexCountsAttr(cc)
+    m.CreateSubdivisionSchemeAttr("catmullClark")       # smooth silhouettes
     shade = 0.10 + r.uniform(0, 0.06)
     UsdGeom.Gprim(m.GetPrim()).CreateDisplayColorAttr([Gf.Vec3f(shade, shade*0.42, shade*0.22)])
     return m
 
 rng2 = np.random.default_rng(7)
 count = 0
-for k in range(140):                                   # scatter field in frustum
-    px, py = rng2.uniform(2, 30), rng2.uniform(-9, 6)
-    if abs(py) < 1.6 and 18 < px < 34: continue        # keep corridor clear
-    rad = rng2.uniform(0.04, 0.22)
+for k in range(620):                                   # scatter field in frustum
+    px, py = rng2.uniform(2, 30), rng2.uniform(-9, 9)
+    if abs(py) < 1.6 and 18 < px < 34: continue
+    if (px-16.0)**2 + (py+4.0)**2 < 4.5**2: continue   # keep crater pit clean        # keep corridor clear
+    rad = rng2.uniform(0.015, 0.20) if rng2.random() > 0.55 else rng2.uniform(0.012, 0.045)
     rk = make_rock(f"/World/rocks/r{k}", 100+k, rad)
     xf = UsdGeom.Xformable(rk.GetPrim())
-    xf.AddTranslateOp().Set(Gf.Vec3d(px, py, rad*0.55 + ground_z(px, py)))
-    xf.AddRotateZOp().Set(rng2.uniform(0, 360)); count += 1
-for k, (bx, by, br) in enumerate([(21.0, -3.2, 0.55), (14.5, 2.4, 0.75), (9.0, -4.5, 0.95), (25.5, 3.4, 0.45)]):
+    xf.AddTranslateOp().Set(Gf.Vec3d(px, py, rad*0.38 + ground_z(px, py)))   # seated deeper
+    xf.AddRotateZOp().Set(rng2.uniform(0, 360))
+    xf.AddRotateXOp().Set(rng2.uniform(-18, 18)); xf.AddRotateYOp().Set(rng2.uniform(-18, 18))
+    xf.AddScaleOp().Set(Gf.Vec3f(rng2.uniform(0.75, 1.35), rng2.uniform(0.75, 1.35), rng2.uniform(0.45, 0.95)))  # squash
+    count += 1
+for _ck, (_ccx, _ccy) in enumerate([(19.5, 2.0), (12.0, -6.5), (24.5, -2.5)]):   # rock clusters
+    for _cj in range(rng2.integers(10, 16)):
+        _pxc = _ccx + rng2.normal(0, 0.9); _pyc = _ccy + rng2.normal(0, 0.9)
+        if abs(_pyc) < 1.6 and 18 < _pxc < 34: continue
+        if (_pxc-16.0)**2 + (_pyc+4.0)**2 < 4.5**2: continue
+        _rc = rng2.uniform(0.02, 0.14)
+        _rk = make_rock(f"/World/rocks/c{_ck}_{_cj}", 700 + _ck*10 + _cj, _rc)
+        _xfc = UsdGeom.Xformable(_rk.GetPrim())
+        _xfc.AddTranslateOp().Set(Gf.Vec3d(_pxc, _pyc, _rc*0.38 + ground_z(_pxc, _pyc)))
+        _xfc.AddRotateZOp().Set(rng2.uniform(0, 360))
+        _xfc.AddRotateXOp().Set(rng2.uniform(-12, 12)); _xfc.AddRotateYOp().Set(rng2.uniform(-12, 12))
+        _xfc.AddScaleOp().Set(Gf.Vec3f(1.0, rng2.uniform(0.85, 1.15), rng2.uniform(0.55, 0.85)))
+        count += 1
+for k, (bx, by, br) in enumerate([(21.0, -3.2, 0.34), (14.5, 2.4, 0.47), (9.0, -4.5, 0.59), (25.5, 3.4, 0.28), (11.5, 4.8, 0.78), (16.5, -7.5, 0.68)]):
     bd = make_rock(f"/World/boulders/b{k}", 500+k, br)
     xf = UsdGeom.Xformable(bd.GetPrim())
-    xf.AddTranslateOp().Set(Gf.Vec3d(bx, by, br*0.5 + ground_z(bx, by)))
+    xf.AddTranslateOp().Set(Gf.Vec3d(bx, by, br*0.36 + ground_z(bx, by)))
     xf.AddRotateZOp().Set(rng2.uniform(0, 360))
+    xf.AddRotateXOp().Set(rng2.uniform(-10, 10)); xf.AddRotateYOp().Set(rng2.uniform(-10, 10))
+    xf.AddScaleOp().Set(Gf.Vec3f(1.0, rng2.uniform(0.9, 1.1), rng2.uniform(0.6, 0.85)))
     UsdPhysics.CollisionAPI.Apply(bd.GetPrim()); count += 1
-print(f"[scene] rocks placed: {count} (procedural, corridor kept clear)")
+hero = make_rock("/World/boulders/hero", 4242, 0.85)
+hxf = UsdGeom.Xformable(hero.GetPrim())
+hxf.AddTranslateOp().Set(Gf.Vec3d(18.5, 5.8, 0.85*0.34 + ground_z(18.5, 5.8)))
+hxf.AddRotateZOp().Set(215.0)
+hxf.AddRotateXOp().Set(-7.0); hxf.AddRotateYOp().Set(5.0)
+hxf.AddScaleOp().Set(Gf.Vec3f(1.15, 0.95, 0.62))          # broad, low-slung monolith
+UsdPhysics.CollisionAPI.Apply(hero.GetPrim()); count += 1
+print(f"[scene] rocks placed: {count} (procedural, corridor kept clear; incl. hero boulder 1.4 m)")
 
 # --------------------------------------------------------------------- camera
 cam = rep.create.camera(position=(33.0, 5.5, 2.6 + ground_z(33, 5.5)),
