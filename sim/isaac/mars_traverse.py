@@ -38,6 +38,7 @@ TOTAL   = int(os.environ.get("TOTAL", "3600"))
 CAP     = int(os.environ.get("CAP", "5"))
 X_END   = float(os.environ.get("X_END", "110.0"))
 FLAT    = os.environ.get("FLAT", "0") == "1"   # diagnostic: single flat collider instead of tiles
+MESHCOL = os.environ.get("MESHCOL", "0") == "1"  # use SDF mesh collision on terrain instead of tiles
 KP      = float(os.environ.get("KP", "150"))
 KD      = float(os.environ.get("KD", "70"))
 TAU_MAX = float(os.environ.get("TAU", "40"))
@@ -125,6 +126,10 @@ m = UsdGeom.Mesh.Define(stage, "/World/terrain")
 m.CreatePointsAttr(pts)
 m.CreateFaceVertexIndicesAttr(idx); m.CreateFaceVertexCountsAttr(cnt)
 UsdGeom.PrimvarsAPI(m.GetPrim()).CreatePrimvar("st", Sdf.ValueTypeNames.TexCoord2fArray, UsdGeom.Tokens.vertex).Set(uvs)
+if MESHCOL:
+    UsdPhysics.CollisionAPI.Apply(m.GetPrim())
+    _mc = UsdPhysics.MeshCollisionAPI.Apply(m.GetPrim()); _mc.CreateApproximationAttr("none")  # exact triangle mesh (static)
+    print("[physics] terrain triangle-mesh collision enabled")
 
 mat = UsdShade.Material.Define(stage, "/World/Looks/ground")
 sh = UsdShade.Shader.Define(stage, "/World/Looks/ground/sh")
@@ -234,7 +239,11 @@ pm = UsdPhysics.MaterialAPI.Apply(gm.GetPrim())
 pm.CreateRestitutionAttr(0.0); pm.CreateStaticFrictionAttr(1.4); pm.CreateDynamicFrictionAttr(1.2)
 UsdGeom.Xform.Define(stage, "/World/phys")
 ntile = 0
-if FLAT:
+if MESHCOL:
+    ntile = 0
+    UsdShade.MaterialBindingAPI.Apply(m.GetPrim()).Bind(gm, materialPurpose="physics")
+    print("[physics] tiles skipped (mesh SDF collision active, friction bound)")
+elif FLAT:
     slab = UsdGeom.Cube.Define(stage, "/World/phys/slab"); slab.CreateSizeAttr(1.0)
     _xf = UsdGeom.Xformable(slab.GetPrim())
     _xf.AddTranslateOp().Set(Gf.Vec3d(60.0, 0.0, -0.15)); _xf.AddScaleOp().Set(Gf.Vec3f(140.0, 40.0, 0.3))
@@ -243,9 +252,9 @@ if FLAT:
     ntile = 1
     print("[physics] FLAT: single slab collider")
 else:
- for tx_ in np.arange(4.0, 116.0, 1.0):
-    for ty_ in np.arange(-16.0, 16.0, 1.0):
-        cx, cy = tx_+0.5, ty_+0.5
+ for tx_ in np.arange(4.0, 116.0, 0.5):
+    for ty_ in np.arange(-16.0, 16.0, 0.5):
+        cx, cy = tx_+0.25, ty_+0.25
         zc = ground_z(cx, cy)
         dzdx = (ground_z(cx+0.25,cy) - ground_z(cx-0.25,cy))*2.0
         dzdy = (ground_z(cx,cy+0.25) - ground_z(cx,cy-0.25))*2.0
@@ -257,8 +266,8 @@ else:
         cube.CreateSizeAttr(1.0)
         xf = UsdGeom.Xformable(cube.GetPrim())
         xf.AddTranslateOp().Set(Gf.Vec3d(cx, cy, zc-0.15))
-        xf.AddOrientOp().Set(Gf.Quatf(float(q[0]), float(q[1]), float(q[2]), float(q[3])))
-        xf.AddScaleOp().Set(Gf.Vec3f(1.4, 1.4, 0.3))
+        xf.AddOrientOp().Set(Gf.Quatf(1.0, 0.0, 0.0, 0.0))   # FLAT tiles: no per-tile slope -> no angle kinks between neighbours
+        xf.AddScaleOp().Set(Gf.Vec3f(0.9, 0.9, 0.3))
         UsdPhysics.CollisionAPI.Apply(cube.GetPrim())
         UsdGeom.Imageable(cube.GetPrim()).MakeInvisible()
         UsdShade.MaterialBindingAPI.Apply(cube.GetPrim()).Bind(gm, materialPurpose="physics")
@@ -267,7 +276,7 @@ print(f"[physics] tiles: {ntile}")
 
 # ---------------- rover ----------------
 add_reference_to_stage(MODEL_PATH, "/World/rover")
-UsdGeom.XformCommonAPI(stage.GetPrimAtPath("/World/rover")).SetTranslate((X_SPAWN, 0.0, ground_z(X_SPAWN,0.0)+0.55))
+UsdGeom.XformCommonAPI(stage.GetPrimAtPath("/World/rover")).SetTranslate((X_SPAWN, 0.0, ground_z(X_SPAWN,0.0)+(0.90 if MESHCOL else 0.55)))
 wm_ = UsdShade.Material.Define(stage, "/World/Looks/wheel_phys")
 wpm = UsdPhysics.MaterialAPI.Apply(wm_.GetPrim())
 wpm.CreateStaticFrictionAttr(1.5); wpm.CreateDynamicFrictionAttr(1.3); wpm.CreateRestitutionAttr(0.0)
