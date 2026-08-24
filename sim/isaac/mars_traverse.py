@@ -37,8 +37,9 @@ LANE    = os.environ.get("LANE", "1") == "1"
 TOTAL   = int(os.environ.get("TOTAL", "3600"))
 CAP     = int(os.environ.get("CAP", "5"))
 X_END   = float(os.environ.get("X_END", "110.0"))
-KP      = float(os.environ.get("KP", "400"))
-KD      = float(os.environ.get("KD", "40"))
+FLAT    = os.environ.get("FLAT", "0") == "1"   # diagnostic: single flat collider instead of tiles
+KP      = float(os.environ.get("KP", "150"))
+KD      = float(os.environ.get("KD", "70"))
 TAU_MAX = float(os.environ.get("TAU", "40"))
 if MODEL == "rigid": MODE = "rigid"
 if MODE != "hybrid": KP = KD = TAU_MAX = 0.0
@@ -96,6 +97,8 @@ for cx,cy,h,s in ridges:  _Zc += gauss(cx, cy, h, s)
 for cx,cy,d,s in hollows: _Zc -= gauss(cx, cy, d, s)
 _edge = np.clip((30.0 - np.abs(Y)) / 20.0, 0.0, 1.0)   # lane (|y|<10) sees only its own features; 20 m blend to scenery
 Z = Z*(1.0-_edge) + _Zc*_edge
+if FLAT:
+    Z[:] = 0.0   # diagnostic flat ground
 print(f"[scene] lane: {len(swell)} swells (25-50 cm), {len(ridges)} ridges (16-28 cm, one-track), {len(hollows)} hollows")
 _ci = lambda x: int((x+EXT/2)/EXT*(N-1))
 print(f"[scene] lane z(x=20)={float(Z[_ci(20),_ci(0)]):.2f} z(x=58)={float(Z[_ci(58),_ci(0)]):.2f} z(x=108)={float(Z[_ci(108),_ci(0)]):.2f}")
@@ -220,7 +223,9 @@ try:
     _sc = stage.GetPrimAtPath("/physicsScene")
     _ps = PhysxSchema.PhysxSceneAPI.Apply(_sc)
     _ps.CreateSolverTypeAttr("TGS"); _ps.CreateEnableCCDAttr(True)
-    print("[physics] scene: TGS + CCD")
+    _ps.CreateMinPositionIterationCountAttr(8); _ps.CreateMaxPositionIterationCountAttr(16)
+    _ps.CreateMinVelocityIterationCountAttr(2); _ps.CreateMaxVelocityIterationCountAttr(4)
+    print("[physics] scene: TGS + CCD, pos-iter 8-16")
 except Exception as _e: print("[physics] scene api:", _e)
 
 # physics ground: 1 m slope-aligned static boxes, raw USD (fast). Terrain mesh collision does not cook in PhysX.
@@ -229,7 +234,16 @@ pm = UsdPhysics.MaterialAPI.Apply(gm.GetPrim())
 pm.CreateRestitutionAttr(0.0); pm.CreateStaticFrictionAttr(1.4); pm.CreateDynamicFrictionAttr(1.2)
 UsdGeom.Xform.Define(stage, "/World/phys")
 ntile = 0
-for tx_ in np.arange(4.0, 116.0, 1.0):
+if FLAT:
+    slab = UsdGeom.Cube.Define(stage, "/World/phys/slab"); slab.CreateSizeAttr(1.0)
+    _xf = UsdGeom.Xformable(slab.GetPrim())
+    _xf.AddTranslateOp().Set(Gf.Vec3d(60.0, 0.0, -0.15)); _xf.AddScaleOp().Set(Gf.Vec3f(140.0, 40.0, 0.3))
+    UsdPhysics.CollisionAPI.Apply(slab.GetPrim()); UsdGeom.Imageable(slab.GetPrim()).MakeInvisible()
+    UsdShade.MaterialBindingAPI.Apply(slab.GetPrim()).Bind(gm, materialPurpose="physics")
+    ntile = 1
+    print("[physics] FLAT: single slab collider")
+else:
+ for tx_ in np.arange(4.0, 116.0, 1.0):
     for ty_ in np.arange(-16.0, 16.0, 1.0):
         cx, cy = tx_+0.5, ty_+0.5
         zc = ground_z(cx, cy)
@@ -253,7 +267,7 @@ print(f"[physics] tiles: {ntile}")
 
 # ---------------- rover ----------------
 add_reference_to_stage(MODEL_PATH, "/World/rover")
-UsdGeom.XformCommonAPI(stage.GetPrimAtPath("/World/rover")).SetTranslate((X_SPAWN, 0.0, ground_z(X_SPAWN,0.0)+0.42))
+UsdGeom.XformCommonAPI(stage.GetPrimAtPath("/World/rover")).SetTranslate((X_SPAWN, 0.0, ground_z(X_SPAWN,0.0)+0.55))
 wm_ = UsdShade.Material.Define(stage, "/World/Looks/wheel_phys")
 wpm = UsdPhysics.MaterialAPI.Apply(wm_.GetPrim())
 wpm.CreateStaticFrictionAttr(1.5); wpm.CreateDynamicFrictionAttr(1.3); wpm.CreateRestitutionAttr(0.0)
@@ -279,12 +293,20 @@ for pr in Usd.PrimRange(stage.GetPrimAtPath("/World/rover")):
             UsdShade.MaterialBindingAPI.Apply(pr).Bind(wheel_mat if "Wheel" in pr.GetName() else body_mat,
                                                        bindingStrength=UsdShade.Tokens.strongerThanDescendants); nv += 1
         except Exception: pass
+for pr in Usd.PrimRange(stage.GetPrimAtPath("/World/rover")):
+    if pr.HasAPI(UsdPhysics.CollisionAPI):
+        try:
+            _cc=PhysxSchema.PhysxCollisionAPI.Apply(pr)
+            _cc.CreateContactOffsetAttr(0.02); _cc.CreateRestOffsetAttr(0.0)
+        except Exception: pass
 print(f"[rover] wheel physics material on {nb} prims, visual material on {nv} links")
 try:
     _nc = 0
     for pr in Usd.PrimRange(stage.GetPrimAtPath("/World/rover")):
         if pr.HasAPI(UsdPhysics.RigidBodyAPI):
-            PhysxSchema.PhysxRigidBodyAPI.Apply(pr).CreateEnableCCDAttr(True); _nc += 1
+            _rb=PhysxSchema.PhysxRigidBodyAPI.Apply(pr); _rb.CreateEnableCCDAttr(True)
+            _rb.CreateSolverPositionIterationCountAttr(16); _rb.CreateSolverVelocityIterationCountAttr(4)
+            _rb.CreateMaxLinearVelocityAttr(20.0); _rb.CreateMaxAngularVelocityAttr(20.0); _nc += 1
     print(f"[rover] CCD enabled on {_nc} bodies")
 except Exception as _e: print("[rover] ccd:", _e)
 
@@ -316,8 +338,8 @@ for i in W: kp[0,i], kd[0,i] = 0.0, 2e3
 if iL is not None:
     if MODE == "passive":                       # free rocker with viscous damping only
         kp[0,iL] = kp[0,iR] = 0.0; kd[0,iL] = kd[0,iR] = 900.0
-    else:                                       # hybrid: effort mode, software differential
-        kp[0,iL] = kp[0,iR] = 0.0; kd[0,iL] = kd[0,iR] = 0.0
+    else:                                       # hybrid: SAME passive damping as B, PLUS active PD torque (fair ablation)
+        kp[0,iL] = kp[0,iR] = 0.0; kd[0,iL] = kd[0,iR] = float(os.environ.get("ROCKER_KD", "300"))
         try: rov.switch_control_mode("effort", joint_indices=np.array([iL, iR])); print("[mode] rocker -> effort")
         except Exception as _e: print("[mode] switch failed:", _e)
 try: rov.set_gains(kps=kp, kds=kd); print("[rover] gains set")
@@ -335,8 +357,8 @@ rp = rep.create.render_product("/World/cam", (1280, 720))
 wr = rep.WriterRegistry.get("BasicWriter")
 wr.initialize(output_dir=f"{RUN_DIR}/frames", rgb=True)
 wr.attach([rp])
-SHOTS = [(-11.0,-7.0,3.2),(-5.0,-4.5,1.6),(7.0,-5.0,2.2),(-3.0,-4.0,1.2),(-14.0,4.5,4.5),(0.0,-12.0,3.0),
-         (-3.5,5.0,1.5),(9.0,5.5,2.8),(-8.0,1.5,1.8),(-6.0,-9.0,4.0),(5.0,-3.5,1.3),(-16.0,-9.0,6.0)]
+SHOTS = [(-12.0,-8.0,4.0),(-9.0,-7.0,3.2),(10.0,-8.0,3.6),(-8.0,-8.0,3.0),(-14.0,6.0,4.8),(2.0,-13.0,4.2),
+         (-8.0,8.0,3.4),(11.0,7.0,3.8),(-11.0,5.0,3.6),(-9.0,-11.0,4.6),(9.0,-8.0,3.2),(-16.0,-10.0,6.0)]
 def set_cam(prim, eye, tgt):
     eye_v = Gf.Vec3d(*eye); tgt_v = Gf.Vec3d(*tgt)
     fwd = tgt_v - eye_v
@@ -418,12 +440,13 @@ for f in range(TOTAL):
     rov.set_joint_position_targets(_st, joint_indices=np.array(S))
 
     if fx is None: fx, fy, fz = rx, ry, rz
-    fx += 0.22*(rx-fx); fy += 0.22*(ry-fy); fz += 0.015*(rz-fz)
+    fx += 0.22*(rx-fx); fy += 0.22*(ry-fy)
+    fz += 0.0025*(rz-fz)                      # almost frozen vertical: chassis pitch/z bounce not copied
     shot = SHOTS[min(int(f/(TOTAL/len(SHOTS))), len(SHOTS)-1)]
-    ex, ey = rx+shot[0], ry+shot[1]
-    ez = max(fz + 0.55*shot[2], ground_z(ex, ey) + 0.9)
+    ex, ey = fx+shot[0], fy+shot[1]           # eye anchored to smoothed centre, not raw rover
+    ez = fz + shot[2] + 1.6                    # eye well above rover -> steady downward framing, ground always under rover
     _hd = math.radians(yaw)
-    set_cam(cam.GetPrim(), (ex, ey, ez), (fx + 0.6*math.cos(_hd), fy + 0.6*math.sin(_hd), fz + 0.95))
+    set_cam(cam.GetPrim(), (ex, ey, ez), (fx + 0.6*math.cos(_hd), fy + 0.6*math.sin(_hd), fz + 0.30))
 
     wm = float(np.mean([v[i] for i in W]))
     tw.writerow([f, round(f*DT,4), round(cv,3), round(rx,3), round(ry,3), round(rz,4),
