@@ -1,6 +1,6 @@
 # ADR-0002: Kinematics package design (T0-R3) — custom C++ double-Ackermann
 
-**Status:** accepted (Zeynep + Barış, 2026-08-03)
+**Status:** accepted (autonomy + mechanical leads)
 **Date:** 2026-08-03
 **Refs:** SUR-AUT-SPEC-001 §4.2, §4.3, T0-R3, TK-3; Jira SURA-23
 

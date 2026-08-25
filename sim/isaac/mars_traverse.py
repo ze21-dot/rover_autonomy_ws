@@ -347,7 +347,7 @@ for i in W: kp[0,i], kd[0,i] = 0.0, 2e3
 if iL is not None:
     if MODE == "passive":                       # free rocker with viscous damping only
         kp[0,iL] = kp[0,iR] = 0.0; kd[0,iL] = kd[0,iR] = 900.0
-    else:                                       # hybrid: SAME passive damping as B, PLUS active PD torque (fair ablation)
+    else:                                       # hybrid: SAME passive damping as B, PLUS active PD torque (controlled ablation)
         kp[0,iL] = kp[0,iR] = 0.0; kd[0,iL] = kd[0,iR] = float(os.environ.get("ROCKER_KD", "300"))
         try: rov.switch_control_mode("effort", joint_indices=np.array([iL, iR])); print("[mode] rocker -> effort")
         except Exception as _e: print("[mode] switch failed:", _e)

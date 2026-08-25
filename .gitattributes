@@ -8,3 +8,4 @@
 *.obj  filter=lfs diff=lfs merge=lfs -text
 *.fbx  filter=lfs diff=lfs merge=lfs -text
 runs/*/video.mp4 filter=lfs diff=lfs merge=lfs -text
+*.STL  filter=lfs diff=lfs merge=lfs -text

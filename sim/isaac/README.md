@@ -3,7 +3,7 @@
 Procedural Mars-analogue terrain, one fixed seed, one camera; only the rover *mode* changes between runs.
 Produces per-run telemetry (CSV), config (JSON), and a real-time 60 s video.
 
-**Pinned environment:** Isaac Sim **6.0.1.0** (cloud standard, see `bootstrap_isaac6.sh`), Python 3.12, PhysX TGS @ 60 Hz, CCD on.
+**Pinned environment:** Isaac Sim **6.0.1.0** (team standard, see `bootstrap_isaac6.sh`), Python 3.12, PhysX TGS @ 60 Hz, CCD on.
 Isaac Sim 5.x is no longer on PyPI; do not attempt to downgrade.
 
 ## Files
@@ -16,7 +16,7 @@ Isaac Sim 5.x is no longer on PyPI; do not attempt to downgrade.
 | `run_matrix.sh` | Sequential 8-run test matrix, one video per run |
 | `../../tools/rover_eval/analyze.py` | Telemetry → metrics table (`runs/metrics.csv`, `runs/metrics.md`) |
 
-## Quick start (cloud instance)
+## Quick start (GPU workstation)
 
 ```bash
 source /workspace/isaac_env/bin/activate
@@ -28,7 +28,7 @@ nohup bash run_matrix.sh > matrix_log.txt 2>&1 &    # full matrix (~40 min)
 python tools/rover_eval/analyze.py                  # metrics table
 ```
 
-Prerequisites on the instance: `karasimsek_rigid.usd` and `karasimsek.usd` at `/workspace/` (URDF → USD via `isaacsim.asset.importer.urdf`, `run_asset_transformer=True`, `collision_from_visuals=True`), meshes pulled with `git lfs pull`.
+Prerequisites on the workstation: `karasimsek_rigid.usd` and `karasimsek.usd` at `/workspace/` (URDF → USD via `isaacsim.asset.importer.urdf`, `run_asset_transformer=True`, `collision_from_visuals=True`), meshes pulled with `git lfs pull`.
 
 ## Parameters (`mars_traverse.py`)
 
@@ -39,7 +39,7 @@ Prerequisites on the instance: `karasimsek_rigid.usd` and `karasimsek.usd` at `/
 | `MODE` | rigid | `rigid` / `passive` (viscous damping only) / `hybrid` (damping + PD common-mode torque) |
 | `SPEED` | 7.0 | Wheel target, rad/s (0.145 m radius → 7 ≈ 1.0 m/s) |
 | `LANE` | 1 | Lane-keeping steering correction on/off |
-| `ROCKER_KD` | 300 | Rocker joint viscous damping (same for passive and hybrid — fair ablation) |
+| `ROCKER_KD` | 300 | Rocker joint viscous damping (same for passive and hybrid — controlled ablation) |
 | `KP` / `KD` / `TAU` | 300 / 70 / 60 | Hybrid PD gains and torque clamp |
 | `TOTAL` / `CAP` | 3600 / 5 | Physics steps @ 60 Hz / capture every CAP steps (720 frames → 60 s @ 12 fps) |
 | `X_END` | 110 | Course end; run stops at x ≥ X_END, timeout, or rollover (>60°) |
