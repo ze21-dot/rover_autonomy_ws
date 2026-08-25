@@ -1,0 +1,31 @@
+[cfg] RUN=A_rigid_7 MODEL=rigid MODE=rigid SPEED=7.0 LANE=True TOTAL=3600 CAP=5 X_END=110.0
+[scene] lane: 11 swells (25-50 cm), 14 ridges (16-28 cm, one-track), 14 hollows
+[scene] lane z(x=20)=0.06 z(x=58)=0.75 z(x=108)=0.28
+[scene] terrain mesh + texture ready
+[scene] rocks: 257 colliding (|y|>=9) + 260 decorative (lane side, no collision)
+[scene] lighting ready
+[physics] scene: TGS + CCD, pos-iter 8-16
+[physics] tiles: 14336
+[rover] wheel physics material on 4 prims, visual material on 28 links
+[rover] CCD enabled on 20 bodies
+[drive] rocker drives created: 2
+[rover] dofs: ['FLSteerJoint', 'RLSteerJoint', 'FRSteerJoint', 'RRSteerJoint', 'FLWheelJoint', 'RLWheelJoint', 'FRWheelJoint', 'RRWheelJoint']
+[mode] rigid (rigid chassis)
+[rover] gains set
+[rover] wheel effort cap 48 Nm
+[calib] E0=+0.0000 D0=+0.0000
+[run] starting: max 3600 steps -> 720 frames, stop at x >= 110.0
+[run] f=0 t=0.0s x=19.97 y=-0.00 z=0.447 roll=+0.1 tau=+0.0 e=+0.0000
+[run] f=300 t=5.0s x=21.03 y=0.00 z=0.467 roll=+0.1 tau=+0.0 e=+0.0000
+[run] f=600 t=10.0s x=23.59 y=0.00 z=0.531 roll=+0.1 tau=+0.0 e=+0.0000
+[run] f=900 t=15.0s x=27.57 y=0.00 z=0.666 roll=+0.1 tau=+0.0 e=+0.0000
+[run] f=1200 t=20.0s x=31.86 y=-0.01 z=1.034 roll=+6.5 tau=+0.0 e=+0.0000
+[run] f=1500 t=25.0s x=36.11 y=0.01 z=1.237 roll=-4.3 tau=+0.0 e=+0.0000
+[run] f=1800 t=30.0s x=40.84 y=0.01 z=0.996 roll=-0.7 tau=+0.0 e=+0.0000
+[run] f=2100 t=35.0s x=45.52 y=0.04 z=0.928 roll=+4.2 tau=+0.0 e=+0.0000
+[run] f=2400 t=40.0s x=49.86 y=0.04 z=1.142 roll=-9.0 tau=+0.0 e=+0.0000
+[run] f=2700 t=45.0s x=54.10 y=0.07 z=1.325 roll=+3.5 tau=+0.0 e=+0.0000
+[run] f=3000 t=50.0s x=58.67 y=-0.03 z=1.249 roll=-2.7 tau=+0.0 e=+0.0000
+[run] f=3300 t=55.0s x=63.36 y=-0.02 z=1.087 roll=+2.2 tau=+0.0 e=+0.0000
+SESSION-ENDED reason=timeout steps=3600 t=60.0s frames=720 x_final=68.03
+[193.775s] Simulation App Shutting Down

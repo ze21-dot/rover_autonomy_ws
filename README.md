@@ -9,7 +9,7 @@ Autonomous navigation pipeline for the **SuRover** platform. Simulation-first (I
 | Project | SuRover Autonomy |
 | Spec | SUR-AUT-SPEC-001 Rev 1.0 |
 | Tracking | Jira project `SURA` (epics = phases, stories = spec task IDs) |
-| Maintainer | Zeynep Altundal (autonomy captain) |
+| Maintainer | Zeynep Altundal |
 
 ## Pinned platform versions (§3 — change only by explicit decision)
 

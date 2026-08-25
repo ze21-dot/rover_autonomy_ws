@@ -1,0 +1,32 @@
+[cfg] RUN=C_hybrid_7 MODEL=revolute MODE=hybrid SPEED=7.0 LANE=True TOTAL=3600 CAP=5 X_END=110.0
+[scene] lane: 11 swells (25-50 cm), 14 ridges (16-28 cm, one-track), 14 hollows
+[scene] lane z(x=20)=0.06 z(x=58)=0.75 z(x=108)=0.28
+[scene] terrain mesh + texture ready
+[scene] rocks: 257 colliding (|y|>=9) + 260 decorative (lane side, no collision)
+[scene] lighting ready
+[physics] scene: TGS + CCD, pos-iter 8-16
+[physics] tiles: 14336
+[rover] wheel physics material on 4 prims, visual material on 28 links
+[rover] CCD enabled on 20 bodies
+[drive] rocker drives created: 2
+[rover] dofs: ['leftjoint', 'rightjoint', 'FLSteerJoint', 'RLSteerJoint', 'FRSteerJoint', 'RRSteerJoint', 'FLWheelJoint', 'RLWheelJoint', 'FRWheelJoint', 'RRWheelJoint']
+[mode] hybrid (articulated)
+[mode] rocker -> effort
+[rover] gains set
+[rover] wheel effort cap 48 Nm
+[calib] E0=+0.0063 D0=-0.0003
+[run] starting: max 3600 steps -> 720 frames, stop at x >= 110.0
+[run] f=0 t=0.0s x=19.97 y=-0.00 z=0.447 roll=+0.1 tau=+0.0 e=+0.0000
+[run] f=300 t=5.0s x=21.02 y=0.00 z=0.467 roll=+0.1 tau=+3.7 e=-0.0069
+[run] f=600 t=10.0s x=23.58 y=0.01 z=0.531 roll=+0.1 tau=+4.0 e=-0.0108
+[run] f=900 t=15.0s x=27.60 y=0.02 z=0.666 roll=+0.1 tau=+5.3 e=-0.0151
+[run] f=1200 t=20.0s x=32.01 y=0.02 z=1.045 roll=+6.8 tau=-28.2 e=+0.0866
+[run] f=1500 t=25.0s x=36.06 y=-0.25 z=1.224 roll=+1.4 tau=-16.0 e=+0.0655
+[run] f=1800 t=30.0s x=40.39 y=0.01 z=0.949 roll=-0.7 tau=+10.7 e=-0.0196
+[run] f=2100 t=35.0s x=44.99 y=0.02 z=0.906 roll=+0.3 tau=+0.0 e=-0.0041
+[run] f=2400 t=40.0s x=48.86 y=-0.02 z=1.207 roll=-6.6 tau=+8.3 e=-0.0146
+[run] f=2700 t=45.0s x=53.01 y=0.09 z=1.218 roll=+0.6 tau=+4.4 e=-0.0057
+[run] f=3000 t=50.0s x=57.39 y=-0.13 z=1.101 roll=+4.5 tau=+0.0 e=-0.0029
+[run] f=3300 t=55.0s x=61.81 y=0.03 z=1.057 roll=-3.0 tau=+10.5 e=-0.0281
+SESSION-ENDED reason=timeout steps=3600 t=60.0s frames=720 x_final=66.11
+[197.288s] Simulation App Shutting Down
